@@ -15,6 +15,15 @@ Simply copy the `Fetch` folder into `site/addons/`. That's it!
 By default, Fetch will 'go deep' and find all nested data recursively within your entries. This means that any related content (saved as an ID) will also be fetched and returned.
 
 This behavior can be disabled via Fetch's settings (CP > Configure > Addons > Fetch). You can also enable/disable deep fetching per request via a query string/tag option (see below for further details). When disabled, only a shallow fetch will be performed; related data will simply be returned as its ID.
+  
+## Settings
+
+The settings page is accessed via `CP > Configure > Addons > Fetch`.
+
+* **Deep** (boolean): Site default to 'go deep' when fetching data.
+* **Enable API Key** (boolean): Whether to use the API Key for authentication.
+* **API Key** (string): Generate an API Key. Only used when `Enable API Key` is set to true.
+* **IP Whitelist** (array): Add a list of IP addresses that are whitelisted to make requests. Leave blank to allow any.
 
 ## Options
 
@@ -24,6 +33,8 @@ This behavior can be disabled via Fetch's settings (CP > Configure > Addons > Fe
 * **debug** (boolean) [ *Default: false* ]: Dump all data on the page (useful to check what data is available).
   * URL param: `http://domain.com/!/Fetch/collection/blog?debug=true`.
   * Tag option: `{{ fetch:blog debug="true" }}`.
+* **api_key** (string): When `Enable API Key` is activated in the settings, make sure to add it to every query.
+  * URL param: `http://domain.com/!/Fetch/collection/blog?api_key=[YOUR_KEY_HERE]`.
 
 ## Example
 
