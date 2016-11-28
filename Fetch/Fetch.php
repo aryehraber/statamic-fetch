@@ -12,9 +12,13 @@ class Fetch
 {
     use Extensible;
 
-    /**
-     * 
-     */
+    public $auth;
+
+    public function __construct()
+    {
+        $this->auth = (new FetchAuth)->isAuth();
+    }
+
     public function handle($collection, $deep = null, $debug = null)
     {
         $entries = $collection->entries();

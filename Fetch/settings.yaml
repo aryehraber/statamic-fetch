@@ -1,3 +1,18 @@
-fields: 
+fields:
+  general:
+    type: section
   deep:
     type: toggle
+    instructions: If set to false, you can manually add it to a request using <code>?deep=true</code>
+  authentication:
+    type: section
+  enable_api_key:
+    type: toggle
+    display: Enable API Key
+  api_key:
+    type: fetch
+    display: API Key
+  ip_whitelist:
+    type: list
+    display: IP Whitelist
+    instructions: Leave blank to allow requests from any IP address

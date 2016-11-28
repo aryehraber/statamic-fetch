@@ -12,6 +12,11 @@ class FetchController extends Controller
     public function init()
     {
         $this->fetch = new Fetch;
+
+        if (! $this->fetch->auth) {
+            header("HTTP/1.1 401 Unauthorized");
+            exit;
+        }
     }
 
     public function getCollection()
