@@ -13,12 +13,25 @@ class FetchAuth
         if ($this->getConfig('enable_api_key', false) && ! $this->checkApiKey()) {
             return false;
         }
-        
+
         if (! empty($this->getConfig('ip_whitelist', [])) && ! $this->checkRemoteAddr()) {
             return false;
         }
 
+        if (! empty($this->getConfig('domain_whitelist', [])) && ! $this->checkRemoteDomain()) {
+            return false;
+        }
+
         return true;
+    }
+
+    private function checkRemoteDomain()
+    {
+        if (in_array($_SERVER['HTTP_HOST'], $this->getConfig('domain_whitelist', []))) {
+            return true;
+        }
+
+        return false;
     }
 
     private function checkRemoteAddr()
