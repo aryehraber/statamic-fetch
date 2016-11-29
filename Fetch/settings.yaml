@@ -16,3 +16,7 @@ fields:
     type: list
     display: IP Whitelist
     instructions: Leave blank to allow requests from any IP address
+  domain_whitelist:
+    type: list
+    display: Domain Whitelist
+    instructions: Leave blank to allow requests from any Domain address
