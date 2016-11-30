@@ -14,7 +14,7 @@ class FetchAuth
             return false;
         }
 
-        if (! empty($this->getConfig('ip_whitelist', [])) && ! $this->checkRemoteAddr()) {
+        if (! empty($this->getConfig('ip_whitelist', [])) && ! $this->checkServerAddr()) {
             return false;
         }
 
@@ -25,9 +25,11 @@ class FetchAuth
         return true;
     }
 
-    private function checkRemoteAddr()
+    private function checkServerAddr()
     {
-        if (in_array($_SERVER['REMOTE_ADDR'], $this->getConfig('ip_whitelist', []))) {
+        $ip = getenv('HTTP_CLIENT_IP') ?: getenv('HTTP_X_FORWARDED_FOR') ?: getenv('REMOTE_ADDR');
+
+        if (in_array($ip, $this->getConfig('ip_whitelist', []))) {
             return true;
         }
 
@@ -45,11 +47,11 @@ class FetchAuth
 
     private function checkRemoteDomain()
     {
-        if (! isset($_SERVER['HTTP_ORIGIN'])) {
+        if (! isset(getenv('HTTP_ORIGIN'))) {
             return true;
         }
         
-        if (in_array($_SERVER['HTTP_ORIGIN'], $this->getConfig('domain_whitelist', []))) {
+        if (in_array(getenv('HTTP_ORIGIN'), $this->getConfig('domain_whitelist', []))) {
             return true;
         }
 
