@@ -19,4 +19,4 @@ fields:
   domain_whitelist:
     type: list
     display: Domain Whitelist
-    instructions: Leave blank to allow requests from any Domain address
+    instructions: Leave blank to allow requests from any Domain
