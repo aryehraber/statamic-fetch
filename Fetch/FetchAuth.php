@@ -46,7 +46,7 @@ class FetchAuth
     private function checkRemoteDomain()
     {
         if (! isset($_SERVER['HTTP_ORIGIN'])) {
-            return false;
+            return true;
         }
         
         if (in_array($_SERVER['HTTP_ORIGIN'], $this->getConfig('domain_whitelist', []))) {
