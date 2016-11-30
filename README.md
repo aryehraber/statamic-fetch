@@ -25,6 +25,8 @@ The settings page is accessed via `CP > Configure > Addons > Fetch`.
 * **API Key** (string): Generate an API Key. Only used when `Enable API Key` is set to true.
 * **IP Whitelist** (array): Add a list of IP addresses that are whitelisted to make requests. Leave blank to allow any.
 
+_Please note that these Authentication options are **not** 100% secure, it’s meant as a simple layer to stop ‘general’ access to the API endpoints. You cannot hold Fetch, or me, accountable for any leaked data._
+
 ## Options
 
 * **deep** (boolean) [ *Default: true* ]: Fetch nested data recursively, works for arrays as well as related content.
