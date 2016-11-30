@@ -25,19 +25,6 @@ class FetchAuth
         return true;
     }
 
-    private function checkRemoteDomain()
-    {
-        if ( isset($_SERVER['HTTP_ORIGIN']) ) {
-            if (in_array($_SERVER['HTTP_ORIGIN'], $this->getConfig('domain_whitelist', []))) {
-                return true;
-            }
-        } else {
-            return true;
-        }
-
-        return false;
-    }
-
     private function checkRemoteAddr()
     {
         if (in_array($_SERVER['REMOTE_ADDR'], $this->getConfig('ip_whitelist', []))) {
@@ -50,6 +37,19 @@ class FetchAuth
     private function checkApiKey()
     {
         if (request('api_key') == $this->getConfig('api_key')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function checkRemoteDomain()
+    {
+        if (! isset($_SERVER['HTTP_ORIGIN'])) {
+            return false;
+        }
+        
+        if (in_array($_SERVER['HTTP_ORIGIN'], $this->getConfig('domain_whitelist', []))) {
             return true;
         }
 
