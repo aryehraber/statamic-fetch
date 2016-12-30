@@ -3,40 +3,112 @@
 namespace Statamic\Addons\Fetch;
 
 use Statamic\API\URL;
+use Statamic\API\Page;
 use Statamic\API\Asset;
 use Statamic\API\Content;
+use Statamic\API\Collection;
 use Statamic\Extend\Extensible;
 use Statamic\Assets\Asset as Image;
+use Statamic\Data\Pages\Page as PageData;
 
 class Fetch
 {
     use Extensible;
 
     public $auth;
+    public $deep;
+    public $debug;
 
-    public function __construct()
+    public function __construct($params = null)
     {
+        $params = collect($params);
+
         $this->auth = (new FetchAuth)->isAuth();
+        $this->deep = request('deep') || $this->getConfigBool('deep') || $params->get('deep');
+        $this->debug = request('debug') || $params->get('debug');
     }
 
-    public function handle($collection, $deep = null, $debug = null)
+    /**
+     * Fetch collection
+     */
+    public function collection($name = null)
     {
-        $entries = $collection->entries();
+        $name = $name ?: request()->segment(4);
 
-        if ($deep || $this->getConfigBool('deep')) {
-            $entries = $entries->map(function ($entry) {
-                return $this->goDeep($entry);
+        if (! $collection = Collection::whereHandle($name)) {
+            return "Collection [$name] not found.";
+        }
+
+        return $this->handle($collection->entries());
+    }
+
+    /**
+     * Fetch single page
+     */
+    public function page($uri = null)
+    {
+        $uri = $uri ?: request()->segment(4);
+
+        if (! $uri || $uri == 'home') {
+            $page = Page::whereUri('/');
+        } else {
+            if (strpos('/'.request()->path(), $this->actionUrl('page')) !== false) {
+                $uri = explode(ltrim($this->actionUrl('page'), '/'), request()->path())[1];
+            }
+
+            if (! $page = Page::whereUri($uri)) {
+                return "Page [$uri] not found.";
+            }
+        }
+
+        return $this->handle($page);
+    }
+
+    /**
+     * Fetch multiple pages
+     */
+    public function pages($pages = null)
+    {
+        $pages = $pages ?: request('pages');
+        $pages = is_array($pages) ? $pages : explode(',', $pages);
+
+        if ($pages) {
+            $pages = collect($pages)->map(function ($uri) {
+                return Page::whereUri(trim($uri));
+            })->filter();
+        } else {
+            $pages = Page::all();
+        }
+
+        return $this->handle($pages);
+    }
+
+    /**
+     * Handle data
+     */
+    private function handle($data)
+    {
+        if ($this->deep) {
+            if ($data instanceof PageData) {
+                $data = $this->goDeep($data);
+            }
+
+            $data = $data->map(function ($item) {
+                return $this->goDeep($item);
             });
         }
 
-        if ($debug) {
-            dd($entries);
+        if ($this->debug) {
+            dd($data);
         }
 
-        return $entries;
+        return $data;
     }
 
-    public function goDeep($item)
+    /**
+     * Fetch item data recursively
+     */
+    private function goDeep($item)
     {
         return collect($item)->map(function ($value, $key) {
             if (is_array($value)) {
@@ -44,14 +116,17 @@ class Fetch
                     return $this->goDeep($value);
                 });
 
-                return $this->isAssoc($array->toArray()) ? $array : $array->collapse();
+                return $this->containsAssoc($array) ? $array : $array->collapse();
             }
 
             return $this->isValid($value, $key) ? $this->relatedData($value) : $value;
         });
     }
 
-    public function relatedData($item)
+    /**
+     * Find related data
+     */
+    private function relatedData($item)
     {
         if (Asset::find($item)) {
             $asset = Asset::find($item)->manipulate()->build();
@@ -66,7 +141,10 @@ class Fetch
         return $item;
     }
 
-    public function isValid($value, $key)
+    /**
+     * Check if value is not id
+     */
+    private function isValid($value, $key)
     {
         if ($key === 'id' || strlen($value) !== 36) {
             return false;
@@ -75,9 +153,26 @@ class Fetch
         return true;
     }
 
-    public function isAssoc($array)
+    /**
+     * Check if array is/contains an associative array
+     */
+    private function containsAssoc($array)
     {
-        if (array() === $array) {
+        if ($this->isAssoc($array->toArray())) {
+            return true;
+        }
+
+        return $array->filter(function ($value) {
+            return $this->isAssoc(collect($value)->toArray());
+        })->count();
+    }
+
+    /**
+     * Check if array is an associative array
+     */
+    private function isAssoc($array)
+    {
+        if ($array === array()) {
             return false;
         }
 

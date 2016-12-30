@@ -1,10 +1,10 @@
 # Fetch
 
-**Access your collection entries as JSON directly using URL endpoints or via a simple tag.**
+**Access your Statamic data as JSON directly using URL endpoints or via a simple tag.**
 
-This addon will automatically make any of your collections accessible via a URL endpoint, or via a simple tag.
+This addon will automatically make any of your collections & pages accessible via a URL endpoint, `GET` / `POST` request, or via a simple tag.
 
-Accessing your collection entries via URL endpoints can be very useful when you need to fetch your site's data dynamically using XHR (XMLHttpRequest) or when you need access from another domain.
+Accessing your collection entries & pages data via URL endpoints can be very useful when you need to fetch your site's data dynamically using XHR (XMLHttpRequest) or when you need access from another domain.
 
 ## Installation
 
@@ -12,7 +12,85 @@ Simply copy the `Fetch` folder into `site/addons/`. That's it!
 
 ## Usage
 
-By default, Fetch will 'go deep' and find all nested data recursively within your entries. This means that any related content (saved as an ID) will also be fetched and returned.
+### Types
+
+* **Collection**: The Collection's slug (eg: `blog`).
+* **Page**: A single page's URI (eg: `/about`).
+* **Pages**: All pages or a comma-separated list of page URIs (eg: `/,/about,/contact-us`).
+
+### Collection Examples
+
+**GET** request using Vue Resource
+
+```javascript
+this.$http.get('/!/Fetch/collection/blog').then(successCallback, errorCallback);
+```
+
+**POST** request using Vue Resource
+
+```javascript
+this.$http.post('/!/Fetch/collection/blog', {api_key: '[YOUR_KEY_HERE]'}).then(successCallback, errorCallback);
+```
+
+**Tag**:
+
+```html
+// Fetch all blog entries
+{{ fetch collection="blog" }}
+
+// Shorthand
+{{ fetch:blog }}
+
+// Example passing data into a Vue component
+<my-component :data='{{ fetch:blog }}'></my-component>
+```
+
+### Page(s) Examples
+
+**GET** request using Vue Resource
+
+```javascript
+this.$http.get('/!/Fetch/page/about').then(successCallback, errorCallback);
+```
+
+```javascript
+var pages = '/, /about, /contact-us';
+
+this.$http.get('/!/Fetch/pages/?pages='+encodeURIComponent(pages)).then(successCallback, errorCallback);
+```
+
+**POST** request using Vue Resource
+
+```javascript
+this.$http.post('/!/Fetch/page/about', {api_key: '[YOUR_KEY_HERE]'}).then(successCallback, errorCallback);
+```
+
+```javascript
+var data = {
+    api_key: '[YOUR_KEY_HERE]',
+    pages: ['/', '/about', '/contact-us']
+}
+
+this.$http.post('/!/Fetch/pages', data).then(successCallback, errorCallback);
+```
+
+**Tag**:
+
+```html
+// Fetch a single page
+{{ fetch page="/about" }}
+
+// Fetch all pages
+{{ fetch:pages }}
+
+// Fetch multiple pages
+{{ fetch pages="/,/about,/contact-us" }}
+
+// Example passing data into a Vue component
+<my-component :data='{{ fetch:pages }}'></my-component>
+```
+
+By default, Fetch will 'go deep' and find all nested data recursively within the dataset. This means that any related content (saved as an ID) will also be fetched and returned.
 
 This behavior can be disabled via Fetch's settings (CP > Configure > Addons > Fetch). You can also enable/disable deep fetching per request via a query string/tag option (see below for further details). When disabled, only a shallow fetch will be performed; related data will simply be returned as its ID.
   
@@ -24,17 +102,19 @@ The settings page is accessed via `CP > Configure > Addons > Fetch`.
 * **Enable API Key** (boolean): Whether to use the API Key for authentication.
 * **API Key** (string): Generate an API Key. Only used when `Enable API Key` is set to true.
 * **IP Whitelist** (array): Add a list of IP addresses that are whitelisted to make requests. Leave blank to allow any.
+* **Domain Whitelist** (array): Add a list of Domains that are whitelisted to make requests. Leave blank to allow any.
 
 ## Options
 
 * **deep** (boolean) [ *Default: true* ]: Fetch nested data recursively, works for arrays as well as related content.
-  * URL param: `http://domain.com/!/Fetch/collection/blog?deep=true`.
-  * Tag option: `{{ fetch:blog deep="true" }}`.
+  * Example URL param: `http://domain.com/!/Fetch/collection/blog?deep=true`.
+  * Example Tag option: `{{ fetch:blog deep="true" }}`.
 * **debug** (boolean) [ *Default: false* ]: Dump all data on the page (useful to check what data is available).
-  * URL param: `http://domain.com/!/Fetch/collection/blog?debug=true`.
-  * Tag option: `{{ fetch:blog debug="true" }}`.
-* **api_key** (string): When `Enable API Key` is activated in the settings, make sure to add it to every query.
-  * URL param: `http://domain.com/!/Fetch/collection/blog?api_key=[YOUR_KEY_HERE]`.
+  * Example URL param: `http://domain.com/!/Fetch/collection/blog?debug=true`.
+  * Example Tag option: `{{ fetch:blog debug="true" }}`.
+* **api_key** (string): When `Enable API Key` is activated in the settings, make sure to add the `api_key` to every request.
+  * Both `GET` and `POST` requests are supported; just include the `api_key` in the url query string or in the body of the request and the data will be returned.
+  * It is recommended to use `POST` requests over https to ensure your `api_key` remains secret (example below).
 
 ## Example
 
@@ -84,20 +164,6 @@ The returned data would look like:
 ```
 
 *(Please note: there's actually a lot more data that is returned, this is simply a summary for the example)*
-
-### URL Endpoint
-
-All the blog entries will be accessible via a GET request to `http://domain.com/!/Fetch/collection/blog`.
-
-### Tag
-
-Using the tag, all the blog entries will be output as JSON using `{{ fetch:blog }}` or `{{ fetch collection="blog" }}`.
-
-When using a frontend framework such as Vue, you sometimes need to pass data directly into a Vue component, this is where Fetch's tag comes in handy...
-
-```html
-<my-component :data="{{ fetch:blog }}"></my-component>
-```
 
 ## Disclaimer
 

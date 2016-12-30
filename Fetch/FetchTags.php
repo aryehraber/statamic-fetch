@@ -11,35 +11,34 @@ class FetchTags extends Tags
 
     public function init()
     {
-        $this->fetch = new Fetch;
+        $this->fetch = new Fetch($this->parameters);
     }
 
     /**
-     * Handle all {{ fetch:* }} tags
+     * Handle `{{ fetch:[collection_name] }}` tags
      */
     public function __call($method, $args)
     {
         if ($name = explode(':', $this->tag)[1]) {
-            return $this->handle($name);
+            if ($name == 'pages') {
+                return $this->fetch->pages();                
+            }
+
+            return $this->fetch->collection($name);
         }
     }
 
     /**
-     * Handle {{ fetch collection="*" }} tags
+     * Handle `{{ fetch collection|page|pages="*" }}` tags
      */
     public function index()
     {
-        $name = $this->getParam('collection');
+        $types = collect(['collection', 'page', 'pages']);
 
-        return $this->handle($name);
-    }
+        $type = $types->first(function ($index, $type) {
+            return in_array($type, array_keys($this->parameters));
+        });
 
-    public function handle($name)
-    {
-        if (! $collection = Collection::whereHandle($name)) {
-            return "Collection [$name] not found.";
-        }
-
-        return $this->fetch->handle($collection, $this->getParam('deep'), $this->getParam('debug'));
+        return $this->fetch->$type($this->parameters[$type]);
     }
 }

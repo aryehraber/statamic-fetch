@@ -1,6 +1,6 @@
 name: Fetch
-version: 1.1
-description: Access collection entries directly using API endpoints.
+version: 2.0
+description: Access Collections and Pages directly  as JSON using GET/POST requests or via a simple tag.
 url: -
 developer: Aryeh Raber
 developer_url: http://aryehdesigns.com

@@ -47,7 +47,7 @@ class FetchAuth
 
     private function checkRemoteDomain()
     {
-        if (! isset(getenv('HTTP_ORIGIN'))) {
+        if (! getenv('HTTP_ORIGIN')) {
             return true;
         }
         

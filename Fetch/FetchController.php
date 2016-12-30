@@ -2,7 +2,6 @@
 
 namespace Statamic\Addons\Fetch;
 
-use Statamic\API\Collection;
 use Statamic\Extend\Controller;
 
 class FetchController extends Controller
@@ -21,12 +20,31 @@ class FetchController extends Controller
 
     public function getCollection()
     {
-        $name = request()->segment(4);
+        return $this->fetch->collection();
+    }
 
-        if (! $collection = Collection::whereHandle($name)) {
-            return "Collection [$name] not found.";
-        }
+    public function postCollection()
+    {
+        return $this->fetch->collection();
+    }
 
-        return $this->fetch->handle($collection, request('deep'), request('debug'));
+    public function getPage()
+    {
+        return $this->fetch->page();
+    }
+
+    public function postPage()
+    {
+        return $this->fetch->page();
+    }
+
+    public function getPages()
+    {
+        return $this->fetch->pages();
+    }
+
+    public function postPages()
+    {
+        return $this->fetch->pages();
     }
 }
