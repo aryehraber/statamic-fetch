@@ -14,9 +14,9 @@ Simply copy the `Fetch` folder into `site/addons/`. That's it!
 
 ### Types
 
-* **Collection**: The Collection's slug (eg: `blog`).
-* **Page**: A single page's URI (eg: `/about`).
-* **Pages**: All pages or a comma-separated list of page URIs (eg: `/,/about,/contact-us`).
+* [**Collection**](#collection-examples): The Collection's slug (eg: `blog`).
+* [**Page**](#pages-examples): A single page's URI (eg: `/about`).
+* [**Pages**](#pages-examples): All pages or a comma-separated list of page URIs (eg: `/,/about,/contact-us`).
 
 ### Collection Examples
 
