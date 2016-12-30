@@ -26,22 +26,36 @@ Simply copy the `Fetch` folder into `site/addons/`. That's it!
 this.$http.get('/!/Fetch/collection/blog').then(successCallback, errorCallback);
 ```
 
-**POST** request using Vue Resource
+**POST** request using Guzzle + API Key
 
-```javascript
-this.$http.post('/!/Fetch/collection/blog', {api_key: '[YOUR_KEY_HERE]'}).then(successCallback, errorCallback);
+```php
+$client = new GuzzleHttp\Client();
+
+$response = $client->post('https://domain.com/!/Fetch/collection/blog', ['api_key' => 'YOUR_KEY_HERE']);
+
+if ($response->getStatusCode() == 200) {
+    $data = collect(json_decode($response->getBody(), true));
+} else {
+    // Handle errors
+}
+
+return $data;
 ```
 
-**Tag**:
+**Tag**
 
+Fetch all blog entries
 ```html
-// Fetch all blog entries
 {{ fetch collection="blog" }}
+```
 
-// Shorthand
+Shorthand
+```html
 {{ fetch:blog }}
+```
 
-// Example passing data into a Vue component
+Example passing data into a Vue component
+```html
 <my-component :data='{{ fetch:blog }}'></my-component>
 ```
 
@@ -59,34 +73,52 @@ var pages = '/, /about, /contact-us';
 this.$http.get('/!/Fetch/pages/?pages='+encodeURIComponent(pages)).then(successCallback, errorCallback);
 ```
 
-**POST** request using Vue Resource
+**POST** request using Vue Resource + API Key
 
 ```javascript
-this.$http.post('/!/Fetch/page/about', {api_key: '[YOUR_KEY_HERE]'}).then(successCallback, errorCallback);
+this.$http.post('/!/Fetch/page/about', {api_key: 'YOUR_KEY_HERE'}).then(successCallback, errorCallback);
 ```
 
-```javascript
-var data = {
-    api_key: '[YOUR_KEY_HERE]',
-    pages: ['/', '/about', '/contact-us']
+**POST** request using Guzzle + API Key
+
+```php
+$client = new GuzzleHttp\Client();
+
+$params = [
+    'api_key' => 'YOUR_KEY_HERE',
+    'pages' => ['/', '/about', '/contact-us']
+];
+
+$response = $client->post('https://domain.com/!/Fetch/page/about', $params);
+
+if ($response->getStatusCode() == 200) {
+    $data = collect(json_decode($response->getBody(), true));
+} else {
+    // Handle errors
 }
 
-this.$http.post('/!/Fetch/pages', data).then(successCallback, errorCallback);
+return $data;
 ```
 
-**Tag**:
+**Tag**
 
+Fetch a single page
 ```html
-// Fetch a single page
 {{ fetch page="/about" }}
+```
 
-// Fetch all pages
+Fetch all pages
+```html
 {{ fetch:pages }}
+```
 
-// Fetch multiple pages
+Fetch multiple pages
+```html
 {{ fetch pages="/,/about,/contact-us" }}
+```
 
-// Example passing data into a Vue component
+Example passing data into a Vue component
+```html
 <my-component :data='{{ fetch:pages }}'></my-component>
 ```
 
