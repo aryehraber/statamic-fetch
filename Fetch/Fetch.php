@@ -2,6 +2,7 @@
 
 namespace Statamic\Addons\Fetch;
 
+use Statamic\API\Str;
 use Statamic\API\URL;
 use Statamic\API\Page;
 use Statamic\API\Asset;
@@ -56,6 +57,8 @@ class Fetch
                 $uri = explode(ltrim($this->actionUrl('page'), '/'), request()->path())[1];
             }
 
+            $uri = Str::ensureLeft(trim($uri), '/');
+
             if (! $page = Page::whereUri($uri)) {
                 return "Page [$uri] not found.";
             }
@@ -70,11 +73,15 @@ class Fetch
     public function pages($pages = null)
     {
         $pages = $pages ?: request('pages');
-        $pages = is_array($pages) ? $pages : explode(',', $pages);
+
+        if (! is_null($pages) && ! is_array($pages)) {
+            $pages = explode(',', $pages);
+        }
 
         if ($pages) {
             $pages = collect($pages)->map(function ($uri) {
-                return Page::whereUri(trim($uri));
+                $uri = Str::ensureLeft(trim($uri), '/');
+                return Page::whereUri($uri);
             })->filter();
         } else {
             $pages = Page::all();
