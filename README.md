@@ -116,7 +116,7 @@ _Please note that these Authentication options are **not** 100% secure, it’s m
   * Example Tag option: `{{ fetch:blog debug="true" }}`.
 * **api_key** (string): When `Enable API Key` is activated in the settings, make sure to add the `api_key` to every request.
   * Both `GET` and `POST` requests are supported; just include the `api_key` in the url query string or in the body of the request and the data will be returned.
-  * It is recommended to use `POST` requests over https to ensure your `api_key` remains secret (example below).
+  * It is recommended to use `POST` requests over **HTTPS** to ensure your `api_key` remains secure.
 
 ## Example
 
