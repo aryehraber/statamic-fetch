@@ -1,6 +1,6 @@
 # Fetch
 
-**Access your Statamic data as JSON directly using URL endpoints or via a simple tag.**
+**Access Collections and Pages directly as JSON using GET/POST requests or via a simple tag.**
 
 This addon will automatically make any of your collections & pages accessible via a URL endpoint, `GET` / `POST` request, or via a simple tag.
 
@@ -103,6 +103,8 @@ The settings page is accessed via `CP > Configure > Addons > Fetch`.
 * **API Key** (string): Generate an API Key. Only used when `Enable API Key` is set to true.
 * **IP Whitelist** (array): Add a list of IP addresses that are whitelisted to make requests. Leave blank to allow any.
 * **Domain Whitelist** (array): Add a list of Domains that are whitelisted to make requests. Leave blank to allow any.
+
+_Please note that these Authentication options are **not** 100% secure, it’s meant as a simple layer to stop ‘general’ access to the API endpoints. You cannot hold Fetch, or me, accountable for any leaked data._
 
 ## Options
 
