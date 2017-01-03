@@ -120,7 +120,7 @@ class Fetch
         return collect($item)->map(function ($value, $key) {
             if (is_array($value)) {
                 $array = collect($value)->map(function ($value) {
-                    return $this->goDeep($value);
+                    return is_string($value) && strlen($value) == 36 ? $this->goDeep($value) : $value;
                 });
 
                 return $this->containsAssoc($array) ? $array : $array->collapse();
@@ -137,7 +137,7 @@ class Fetch
     {
         if (Asset::find($item)) {
             $asset = Asset::find($item)->manipulate()->build();
-            
+
             return URL::makeAbsolute($asset);
         }
 
