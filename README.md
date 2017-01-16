@@ -63,10 +63,17 @@ Example passing data into a Vue component
 
 **GET** request using Vue Resource
 
+Fetch a single page
 ```javascript
 this.$http.get('/!/Fetch/page/about').then(successCallback, errorCallback);
 ```
 
+Fetch all pages
+```javascript
+this.$http.get('/!/Fetch/pages').then(successCallback, errorCallback);
+```
+
+Fetch multiple pages
 ```javascript
 var pages = '/, /about, /contact-us';
 
@@ -89,7 +96,7 @@ $params = [
     'pages' => ['/', '/about', '/contact-us']
 ];
 
-$response = $client->post('https://domain.com/!/Fetch/page/about', $params);
+$response = $client->post('https://domain.com/!/Fetch/pages', $params);
 
 if ($response->getStatusCode() == 200) {
     $data = collect(json_decode($response->getBody(), true));
