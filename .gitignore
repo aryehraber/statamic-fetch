@@ -1,1 +1,6 @@
 .DS_Store
+node_modules/
+package.json
+mix-manifest.json
+webpack.mix.js
+yarn.lock
