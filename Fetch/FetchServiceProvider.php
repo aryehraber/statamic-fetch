@@ -12,8 +12,11 @@ class FetchServiceProvider extends ServiceProvider
     public function boot()
     {
         $excludes = Config::get('system.csrf_exclude', []);
-        
-        $excludes[] = $this->actionUrl('*');
-        Config::set('system.csrf_exclude', $excludes);
+        $actionUrl = $this->actionUrl('*');
+
+        if (! in_array($actionUrl, $excludes)) {
+            $excludes[] = $actionUrl;
+            Config::set('system.csrf_exclude', $excludes);
+        }
     }
 }
