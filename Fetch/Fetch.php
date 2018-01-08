@@ -20,6 +20,7 @@ class Fetch
     public $auth;
     public $deep;
     public $debug;
+    public $locale;
 
     public function __construct($params = null)
     {
@@ -28,6 +29,7 @@ class Fetch
         $this->auth = (new FetchAuth)->isAuth();
         $this->deep = bool(request('deep')) || $this->getConfigBool('deep') || $params->get('deep');
         $this->debug = bool(request('debug')) || $params->get('debug');
+        $this->locale = request('locale') ?: $params->get('locale') ?: default_locale();
     }
 
     /**
@@ -99,16 +101,32 @@ class Fetch
     {
         if ($this->deep) {
             if ($data instanceof PageData) {
-                $data = $this->goDeep($data);
+                $data = $this->getLocalisedData($data);
             } else {
                 $data = $data->map(function ($item) {
-                    return $this->goDeep($item);
+                    return $this->getLocalisedData($item);
                 });
             }
         }
 
         if ($this->debug) {
             dd($data);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Get localised data
+     */
+    private function getLocalisedData($rawData)
+    {
+        $data = $this->goDeep($rawData);
+
+        if ($this->locale !== default_locale()) {
+            $localisedData = $this->goDeep($rawData->dataForLocale($this->locale));
+
+            $data = $data->merge($localisedData);
         }
 
         return $data;

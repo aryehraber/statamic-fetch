@@ -9,19 +9,16 @@ class FetchTags extends Tags
 {
     private $fetch;
 
-    public function init()
-    {
-        $this->fetch = new Fetch($this->parameters);
-    }
-
     /**
      * Handle `{{ fetch:[collection_name] }}` tags
      */
     public function __call($method, $args)
     {
+        $this->fetch = new Fetch($this->parameters);
+
         if ($name = explode(':', $this->tag)[1]) {
-            if ($name == 'pages') {
-                return $this->fetch->pages();                
+            if ($name === 'pages') {
+                return $this->fetch->pages();
             }
 
             return $this->fetch->collection($name);
@@ -33,6 +30,8 @@ class FetchTags extends Tags
      */
     public function index()
     {
+        $this->fetch = new Fetch($this->parameters);
+
         $types = collect(['collection', 'page', 'pages']);
 
         $type = $types->first(function ($index, $type) {
