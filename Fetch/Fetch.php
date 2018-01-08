@@ -2,14 +2,15 @@
 
 namespace Statamic\Addons\Fetch;
 
+use Carbon\Carbon;
 use Statamic\API\Str;
-use Statamic\API\URL;
 use Statamic\API\Page;
+use Statamic\API\Term;
 use Statamic\API\Asset;
 use Statamic\API\Content;
+use Statamic\API\Taxonomy;
 use Statamic\API\Collection;
 use Statamic\Extend\Extensible;
-use Statamic\Assets\Asset as Image;
 use Statamic\Data\Pages\Page as PageData;
 
 class Fetch
@@ -25,8 +26,8 @@ class Fetch
         $params = collect($params);
 
         $this->auth = (new FetchAuth)->isAuth();
-        $this->deep = request('deep') || $this->getConfigBool('deep') || $params->get('deep');
-        $this->debug = request('debug') || $params->get('debug');
+        $this->deep = bool(request('deep')) || $this->getConfigBool('deep') || $params->get('deep');
+        $this->debug = bool(request('debug')) || $params->get('debug');
     }
 
     /**
@@ -81,6 +82,7 @@ class Fetch
         if ($pages) {
             $pages = collect($pages)->map(function ($uri) {
                 $uri = Str::ensureLeft(trim($uri), '/');
+
                 return Page::whereUri($uri);
             })->filter();
         } else {
@@ -98,11 +100,11 @@ class Fetch
         if ($this->deep) {
             if ($data instanceof PageData) {
                 $data = $this->goDeep($data);
+            } else {
+                $data = $data->map(function ($item) {
+                    return $this->goDeep($item);
+                });
             }
-
-            $data = $data->map(function ($item) {
-                return $this->goDeep($item);
-            });
         }
 
         if ($this->debug) {
@@ -117,72 +119,60 @@ class Fetch
      */
     private function goDeep($item)
     {
-        return collect($item)->map(function ($value, $key) {
+        $item = collect($item)->map(function ($value, $key) {
             if (is_array($value)) {
-                $array = collect($value)->map(function ($value) {
-                    return is_string($value) && strlen($value) == 36 ? $this->goDeep($value) : $value;
-                });
+                return collect($value)->map(function ($value) use ($key) {
+                    if (Taxonomy::handleExists($key)) {
+                        return $this->relatedData($value, $key);
+                    }
 
-                return $this->containsAssoc($array) ? $array : $array->collapse();
+                    return is_string($value) ? $this->goDeep($value) : $value;
+                });
             }
 
-            return $this->isValid($value, $key) ? $this->relatedData($value) : $value;
+            return $this->isRelatable($value, $key) ? $this->relatedData($value, $key) : $value;
         });
+
+        return $item->count() === 1 ? $item->first() : $item;
     }
 
     /**
      * Find related data
      */
-    private function relatedData($item)
+    private function relatedData($value, $key)
     {
-        if (Asset::find($item)) {
-            $asset = Asset::find($item)->manipulate()->build();
-
-            return URL::makeAbsolute($asset);
+        if ($asset = Asset::find($value)) {
+            return $asset->absoluteUrl();
         }
 
-        if (Content::exists($item)) {
-            return Content::find($item)->data();
+        if ($term = Term::whereSlug($value, $key)) {
+            return $term;
         }
 
-        return $item;
+        if (Content::exists($value)) {
+            return Content::find($value)->data();
+        }
+
+        return $value;
     }
 
     /**
-     * Check if value is not id
+     * Check if value could be relatable data
      */
-    private function isValid($value, $key)
+    private function isRelatable($value, $key)
     {
-        if ($key === 'id' || strlen($value) !== 36) {
+        if ($key === 'id') {
+            return false;
+        }
+
+        if (is_bool($value)) {
+            return false;
+        }
+
+        if ($value instanceof Carbon) {
             return false;
         }
 
         return true;
-    }
-
-    /**
-     * Check if array is/contains an associative array
-     */
-    private function containsAssoc($array)
-    {
-        if ($this->isAssoc($array->toArray())) {
-            return true;
-        }
-
-        return $array->filter(function ($value) {
-            return $this->isAssoc(collect($value)->toArray());
-        })->count();
-    }
-
-    /**
-     * Check if array is an associative array
-     */
-    private function isAssoc($array)
-    {
-        if ($array === array()) {
-            return false;
-        }
-
-        return array_keys($array) !== range(0, count($array) - 1);
     }
 }
