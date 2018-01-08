@@ -132,7 +132,7 @@ Example passing data into a Vue component
 By default, Fetch will 'go deep' and find all nested data recursively within the dataset. This means that any related content (saved as an ID) will also be fetched and returned.
 
 This behavior can be disabled via Fetch's settings (CP > Configure > Addons > Fetch). You can also enable/disable deep fetching per request via a query string/tag option (see below for further details). When disabled, only a shallow fetch will be performed; related data will simply be returned as its ID.
-  
+
 ## Settings
 
 The settings page is accessed via `CP > Configure > Addons > Fetch`.
@@ -150,6 +150,9 @@ _Please note that these Authentication options are **not** 100% secure, it’s m
 * **deep** (boolean) [ *Default: true* ]: Fetch nested data recursively, works for arrays as well as related content.
   * Example URL param: `http://domain.com/!/Fetch/collection/blog?deep=true`.
   * Example Tag option: `{{ fetch:blog deep="true" }}`.
+* **locale** (string) [ *Default: default_locale* ]: Fetch data for a specific locale.
+  * Example URL param: `http://domain.com/!/Fetch/collection/blog?locale=nl`.
+  * Example Tag option: `{{ fetch:blog locale="nl" }}`.
 * **debug** (boolean) [ *Default: false* ]: Dump all data on the page (useful to check what data is available).
   * Example URL param: `http://domain.com/!/Fetch/collection/blog?debug=true`.
   * Example Tag option: `{{ fetch:blog debug="true" }}`.
@@ -165,7 +168,7 @@ Now, say we have a simple collection of blog entries and a single entry looks li
 title: My Awesome Blog Post
 id: f1f92ae6-00a8-4626-a1fc-de900a7f9203
 content: Lorem ipsum aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.
-categories: 
+categories:
   - bdc2086c-961b-4b84-8c65-da0e6823e6e9
   - e13a11ca-aaa2-4e7b-83ec-15e904f918a8
 images:
@@ -190,7 +193,7 @@ The returned data would look like:
                 "title": "Awesome Addons",
                 "id": "e13a11ca-aaa2-4e7b-83ec-15e904f918a8"
             },
-        ],  
+        ],
         "images": [
             "http://domain.com/img/id/74a39e87-16c2-4052-a028-26f00baca541"
             "http://domain.com/img/id/edc7fd1e-ca3a-4528-b4b7-f3be6ad87d8a"
