@@ -140,11 +140,18 @@ class Fetch
         $item = collect($item)->map(function ($value, $key) {
             if (is_array($value)) {
                 return collect($value)->map(function ($value) use ($key) {
-                    if (Taxonomy::handleExists($key)) {
-                        return $this->relatedData($value, $key);
+
+                    if (is_string($value)) {
+                        if (Taxonomy::handleExists($value)) {
+                            return $this->relatedData($value, $key);
+                        }
+
+                        if (Page::find($value)) {
+                            return $this->relatedData($value, $key);
+                        }
                     }
 
-                    return is_string($value) ? $this->goDeep($value) : $value;
+                    return is_string($value) ? $value : $this->goDeep($value);
                 });
             }
 
@@ -163,12 +170,26 @@ class Fetch
             return $asset->absoluteUrl();
         }
 
+        if ($page = Page::find($value)) {
+          return $page;
+        }
+
         if ($term = Term::whereSlug($value, $key)) {
             return $term;
         }
 
         if (Content::exists($value)) {
             return Content::find($value)->data();
+        }
+
+        if (is_array(explode("/", $value))) {
+            $taxonomyParts = explode("/", $value);
+
+            if (sizeof($taxonomyParts) === 2) {
+                if ($term = Term::whereSlug($taxonomyParts[1], $taxonomyParts[0])) {
+                    return $term;
+                }
+            }
         }
 
         return $value;
