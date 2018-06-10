@@ -163,7 +163,7 @@ class Fetch
             return $asset->absoluteUrl();
         }
 
-        if ($term = Term::whereSlug($value, $key)) {
+        if ($term = $this->findTerm($value)) {
             return $term;
         }
 
@@ -172,6 +172,20 @@ class Fetch
         }
 
         return $value;
+    }
+
+    /**
+     * Find taxonomy term
+     */
+    private function findTerm($value)
+    {
+        if (strpos($value, '/') === false) {
+            return null;
+        }
+
+        list($taxonomy, $slug) = explode('/', $value);
+
+        return Term::whereSlug($slug, $taxonomy);
     }
 
     /**
