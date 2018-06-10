@@ -139,12 +139,8 @@ class Fetch
     {
         $item = collect($item)->map(function ($value, $key) {
             if (is_array($value)) {
-                return collect($value)->map(function ($value) use ($key) {
-                    if (Taxonomy::handleExists($key)) {
-                        return $this->relatedData($value, $key);
-                    }
-
-                    return is_string($value) ? $this->goDeep($value) : $value;
+                return collect($value)->map(function ($value) {
+                   return $this->goDeep($value);
                 });
             }
 
