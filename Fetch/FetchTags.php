@@ -21,18 +21,22 @@ class FetchTags extends Tags
                 return $this->fetch->pages();
             }
 
+            if ($name === 'globals') {
+                return $this->fetch->globals();
+            }
+
             return $this->fetch->collection($name);
         }
     }
 
     /**
-     * Handle `{{ fetch collection|page|pages="*" }}` tags
+     * Handle `{{ fetch collection|page|pages="*"|global|globals="*" }}` tags
      */
     public function index()
     {
         $this->fetch = new Fetch($this->parameters);
 
-        $types = collect(['collection', 'page', 'pages']);
+        $types = collect(['collection', 'page', 'pages', 'global', 'globals']);
 
         $type = $types->first(function ($index, $type) {
             return in_array($type, array_keys($this->parameters));
