@@ -204,6 +204,10 @@ class Fetch
             return Content::find($value)->data();
         }
 
+        if ($key === 'mount') {
+            return $this->handle(Collection::whereHandle($value)->entries());
+        }
+
         return $value;
     }
 
