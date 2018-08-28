@@ -17,6 +17,8 @@ Simply copy the `Fetch` folder into `site/addons/`. That's it!
 * [**Collection**](#collection-examples): The Collection's slug (eg: `blog`).
 * [**Page**](#pages-examples): A single page's URI (eg: `/about`).
 * [**Pages**](#pages-examples): All pages or a comma-separated list of page URIs (eg: `/,/about,/contact-us`).
+* [**Global**](#globals-examples): A single global slug (eg: `opening_hours`).
+* [**Globals**](#globals-examples): All globals or a comma-separated list of global slugs (eg: `general,contact_info,opening_hours`).
 
 ### Collection Examples
 
@@ -127,6 +129,80 @@ Fetch multiple pages
 Example passing data into a Vue component
 ```html
 <my-component :data='{{ fetch:pages }}'></my-component>
+```
+
+By default, Fetch will 'go deep' and find all nested data recursively within the dataset. This means that any related content (saved as an ID) will also be fetched and returned.
+
+This behavior can be disabled via Fetch's settings (CP > Configure > Addons > Fetch). You can also enable/disable deep fetching per request via a query string/tag option (see below for further details). When disabled, only a shallow fetch will be performed; related data will simply be returned as its ID.
+
+### Global(s) Examples
+
+**GET** request using Vue Resource
+
+Fetch a single global
+```javascript
+this.$http.get('/!/Fetch/global/opening_hours').then(successCallback, errorCallback);
+```
+
+Fetch all globals
+```javascript
+this.$http.get('/!/Fetch/globals').then(successCallback, errorCallback);
+```
+
+Fetch multiple globals
+```javascript
+var globals = 'general, contact_info, opening_hours';
+
+this.$http.get('/!/Fetch/globals/?globals='+encodeURIComponent(globals)).then(successCallback, errorCallback);
+```
+
+**POST** request using Vue Resource + API Key
+
+```javascript
+this.$http.post('/!/Fetch/globals/opening_hours', {api_key: 'YOUR_KEY_HERE'}).then(successCallback, errorCallback);
+```
+
+**POST** request using Guzzle + API Key
+
+```php
+$client = new GuzzleHttp\Client();
+
+$params = [
+    'api_key' => 'YOUR_KEY_HERE',
+    'globals' => ['general', 'contact_info', 'opening_hours']
+];
+
+$response = $client->post('https://domain.com/!/Fetch/globals', $params);
+
+if ($response->getStatusCode() == 200) {
+    $data = collect(json_decode($response->getBody(), true));
+} else {
+    // Handle errors
+}
+
+return $data;
+```
+
+**Tag**
+
+Fetch a single global
+```html
+{{ fetch global="opening_hours" }}
+```
+
+Fetch all globals
+```html
+{{ fetch:globals }}
+```
+
+Fetch multiple globals
+```html
+{{ fetch globals="general, contact_info, opening_hours" }}
+```
+
+Example passing data into a Vue component
+```html
+<my-component :data='{{ fetch:globals }}'></my-component>
 ```
 
 By default, Fetch will 'go deep' and find all nested data recursively within the dataset. This means that any related content (saved as an ID) will also be fetched and returned.

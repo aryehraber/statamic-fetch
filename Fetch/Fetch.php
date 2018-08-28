@@ -8,10 +8,11 @@ use Statamic\API\Page;
 use Statamic\API\Term;
 use Statamic\API\Asset;
 use Statamic\API\Content;
-use Statamic\API\Taxonomy;
+use Statamic\API\GlobalSet;
 use Statamic\API\Collection;
 use Statamic\Extend\Extensible;
 use Statamic\Data\Pages\Page as PageData;
+use Statamic\Data\Globals\GlobalSet as GlobalData;
 
 class Fetch
 {
@@ -95,12 +96,48 @@ class Fetch
     }
 
     /**
+     * Fetch single global
+     */
+    public function global($handle = null)
+    {
+        $handle = $handle ?: request()->segment(4);
+
+        if (! $global = GlobalSet::whereHandle($handle)) {
+            return "Page [$handle] not found.";
+        }
+
+        return $this->handle($global);
+    }
+
+    /**
+     * Fetch multiple globals
+     */
+    public function globals($globals = null)
+    {
+        $globals = $globals ?: request('globals');
+
+        if (! is_null($globals) && ! is_array($globals)) {
+            $globals = explode(',', $globals);
+        }
+
+        if ($globals) {
+            $globals = collect($globals)->map(function ($handle) {
+                return GlobalSet::whereHandle($handle);
+            })->filter();
+        } else {
+            $globals = GlobalSet::all();
+        }
+
+        return $this->handle($globals);
+    }
+
+    /**
      * Handle data
      */
     private function handle($data)
     {
         if ($this->deep) {
-            if ($data instanceof PageData) {
+            if ($data instanceof PageData || $data instanceof GlobalData) {
                 $data = $this->getLocalisedData($data);
             } else {
                 $data = $data->map(function ($item) {

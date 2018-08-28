@@ -47,4 +47,24 @@ class FetchController extends Controller
     {
         return $this->fetch->pages();
     }
+
+    public function getGlobal()
+    {
+        return $this->fetch->global();
+    }
+
+    public function postGlobal()
+    {
+        return $this->fetch->global();
+    }
+
+    public function getGlobals()
+    {
+        return $this->fetch->globals();
+    }
+
+    public function postGlobals()
+    {
+        return $this->fetch->globals();
+    }
 }
