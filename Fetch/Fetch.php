@@ -201,7 +201,7 @@ class Fetch
         }
 
         if (Content::exists($value)) {
-            return Content::find($value)->data();
+            return Content::find($value)->toArray();
         }
 
         if ($key === 'mount') {
