@@ -1,5 +1,5 @@
 name: Fetch
-version: 3.2
+version: 3.4
 description: Access Collections and Pages directly as JSON using GET/POST requests or via a simple tag.
 url: -
 developer: Aryeh Raber
