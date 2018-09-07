@@ -2,6 +2,24 @@
 
 Simply copy the `Fetch` folder into `site/addons/`. That's it!
 
+## Options
+
+* **deep** (boolean) [ *Default: true* ]: Fetch nested data recursively, works for arrays as well as related content.
+  * Example URL param: `http://domain.com/!/Fetch/collection/blog?deep=true`.
+  * Example Tag option: `{{ fetch:blog deep="true" }}`.
+* **filter** (string) [ *Default: null* ]: Optionally filter `published` and `unpublished` content.
+  * Example URL param: `http://domain.com/!/Fetch/collection/blog?filter=published`.
+  * Example Tag option: `{{ fetch:blog filter="published" }}`.
+* **locale** (string) [ *Default: default_locale* ]: Fetch data for a specific locale.
+  * Example URL param: `http://domain.com/!/Fetch/collection/blog?locale=nl`.
+  * Example Tag option: `{{ fetch:blog locale="nl" }}`.
+* **debug** (boolean) [ *Default: false* ]: Dump all data on the page (useful to check what data is available).
+  * Example URL param: `http://domain.com/!/Fetch/collection/blog?debug=true`.
+  * Example Tag option: `{{ fetch:blog debug="true" }}`.
+* **api_key** (string): When `Enable API Key` is activated in the settings, make sure to add the `api_key` to every request.
+  * Both `GET` and `POST` requests are supported; just include the `api_key` in the url query string or in the body of the request and the data will be returned.
+  * It is recommended to use `POST` requests over **HTTPS** to ensure your `api_key` remains secure.
+
 ## Usage
 
 ### Types
@@ -212,21 +230,3 @@ The settings page is accessed via `CP > Configure > Addons > Fetch`.
 * **Domain Whitelist** (array): Add a list of Domains that are whitelisted to make requests. Leave blank to allow any.
 
 _Please note that these Authentication options are **not** 100% secure, it’s meant as a simple layer to stop ‘general’ access to the API endpoints. You cannot hold Fetch, or me, accountable for any leaked data._
-
-## Options
-
-* **deep** (boolean) [ *Default: true* ]: Fetch nested data recursively, works for arrays as well as related content.
-  * Example URL param: `http://domain.com/!/Fetch/collection/blog?deep=true`.
-  * Example Tag option: `{{ fetch:blog deep="true" }}`.
-* **filter** (string) [ *Default: null* ]: Optionally filter `published` and `unpublished` content.
-  * Example URL param: `http://domain.com/!/Fetch/collection/blog?filter=published`.
-  * Example Tag option: `{{ fetch:blog filter="published" }}`.
-* **locale** (string) [ *Default: default_locale* ]: Fetch data for a specific locale.
-  * Example URL param: `http://domain.com/!/Fetch/collection/blog?locale=nl`.
-  * Example Tag option: `{{ fetch:blog locale="nl" }}`.
-* **debug** (boolean) [ *Default: false* ]: Dump all data on the page (useful to check what data is available).
-  * Example URL param: `http://domain.com/!/Fetch/collection/blog?debug=true`.
-  * Example Tag option: `{{ fetch:blog debug="true" }}`.
-* **api_key** (string): When `Enable API Key` is activated in the settings, make sure to add the `api_key` to every request.
-  * Both `GET` and `POST` requests are supported; just include the `api_key` in the url query string or in the body of the request and the data will be returned.
-  * It is recommended to use `POST` requests over **HTTPS** to ensure your `api_key` remains secure.
