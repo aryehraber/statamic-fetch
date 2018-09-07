@@ -284,7 +284,3 @@ The returned data would look like:
 ```
 
 *(Please note: there's actually a lot more data that is returned, this is simply a summary for the example)*
-
-## Disclaimer
-
-This addon was created for personal use and may not work for every use case, therefore support for every site cannot be guaranteed. Feel free to fork this repo or submit a pull request if you have any ideas on improving Fetch.
