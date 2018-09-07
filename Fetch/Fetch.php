@@ -11,8 +11,7 @@ use Statamic\API\Content;
 use Statamic\API\GlobalSet;
 use Statamic\API\Collection;
 use Statamic\Extend\Extensible;
-use Statamic\Data\Pages\Page as PageData;
-use Statamic\Data\Globals\GlobalSet as GlobalData;
+use Illuminate\Support\Collection as IlluminateCollection;
 
 class Fetch
 {
@@ -137,12 +136,12 @@ class Fetch
     private function handle($data)
     {
         if ($this->deep) {
-            if ($data instanceof PageData || $data instanceof GlobalData) {
-                $data = $this->getLocalisedData($data);
-            } else {
+            if ($data instanceof IlluminateCollection) {
                 $data = $data->map(function ($item) {
                     return $this->getLocalisedData($item);
                 });
+            } else {
+                $data = $this->getLocalisedData($data);
             }
         }
 
