@@ -32,10 +32,10 @@ Simply copy the `Fetch` folder into `site/addons/`. That's it!
 
 ### Collection Examples
 
-**GET** request using Vue Resource
+**GET** request using Axios
 
 ```javascript
-this.$http.get('/!/Fetch/collection/blog').then(successCallback, errorCallback);
+axios.get('/!/Fetch/collection/blog').then(...);
 ```
 
 **POST** request using Guzzle + API Key
@@ -73,29 +73,29 @@ Example passing data into a Vue component
 
 ### Page(s) Examples
 
-**GET** request using Vue Resource
+**GET** request using Axios
 
 Fetch a single page
 ```javascript
-this.$http.get('/!/Fetch/page/about').then(successCallback, errorCallback);
+axios.get('/!/Fetch/page/about').then(...);
 ```
 
 Fetch all pages
 ```javascript
-this.$http.get('/!/Fetch/pages').then(successCallback, errorCallback);
+axios.get('/!/Fetch/pages').then(...);
 ```
 
 Fetch multiple pages
 ```javascript
 var pages = '/, /about, /contact-us';
 
-this.$http.get('/!/Fetch/pages/?pages='+encodeURIComponent(pages)).then(successCallback, errorCallback);
+axios.get('/!/Fetch/pages/?pages='+encodeURIComponent(pages)).then(...);
 ```
 
-**POST** request using Vue Resource + API Key
+**POST** request using Axios + API Key
 
 ```javascript
-this.$http.post('/!/Fetch/page/about', {api_key: 'YOUR_KEY_HERE'}).then(successCallback, errorCallback);
+axios.post('/!/Fetch/page/about', {api_key: 'YOUR_KEY_HERE'}).then(...);
 ```
 
 **POST** request using Guzzle + API Key
@@ -147,29 +147,29 @@ This behavior can be disabled via Fetch's settings (CP > Configure > Addons > Fe
 
 ### Global(s) Examples
 
-**GET** request using Vue Resource
+**GET** request using Axios
 
 Fetch a single global
 ```javascript
-this.$http.get('/!/Fetch/global/opening_hours').then(successCallback, errorCallback);
+axios.get('/!/Fetch/global/opening_hours').then(...);
 ```
 
 Fetch all globals
 ```javascript
-this.$http.get('/!/Fetch/globals').then(successCallback, errorCallback);
+axios.get('/!/Fetch/globals').then(...);
 ```
 
 Fetch multiple globals
 ```javascript
 var globals = 'general, contact_info, opening_hours';
 
-this.$http.get('/!/Fetch/globals/?globals='+encodeURIComponent(globals)).then(successCallback, errorCallback);
+axios.get('/!/Fetch/globals/?globals='+encodeURIComponent(globals)).then(...);
 ```
 
-**POST** request using Vue Resource + API Key
+**POST** request using Axios + API Key
 
 ```javascript
-this.$http.post('/!/Fetch/globals/opening_hours', {api_key: 'YOUR_KEY_HERE'}).then(successCallback, errorCallback);
+axios.post('/!/Fetch/globals/opening_hours', {api_key: 'YOUR_KEY_HERE'}).then(...);
 ```
 
 **POST** request using Guzzle + API Key
