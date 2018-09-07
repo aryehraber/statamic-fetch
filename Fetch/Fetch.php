@@ -11,8 +11,7 @@ use Statamic\API\Content;
 use Statamic\API\GlobalSet;
 use Statamic\API\Collection;
 use Statamic\Extend\Extensible;
-use Statamic\Data\Pages\Page as PageData;
-use Statamic\Data\Globals\GlobalSet as GlobalData;
+use Illuminate\Support\Collection as IlluminateCollection;
 
 class Fetch
 {
@@ -30,6 +29,7 @@ class Fetch
         $this->auth = (new FetchAuth)->isAuth();
         $this->deep = bool(request('deep')) || $this->getConfigBool('deep') || $params->get('deep');
         $this->debug = bool(request('debug')) || $params->get('debug');
+        $this->filter = request('filter') ?: $params->get('filter');
         $this->locale = request('locale') ?: $params->get('locale') ?: default_locale();
     }
 
@@ -136,13 +136,15 @@ class Fetch
      */
     private function handle($data)
     {
+        $data = $this->filterData($data);
+
         if ($this->deep) {
-            if ($data instanceof PageData || $data instanceof GlobalData) {
-                $data = $this->getLocalisedData($data);
-            } else {
+            if ($data instanceof IlluminateCollection) {
                 $data = $data->map(function ($item) {
                     return $this->getLocalisedData($item);
                 });
+            } else {
+                $data = $this->getLocalisedData($data);
             }
         }
 
@@ -151,6 +153,48 @@ class Fetch
         }
 
         return $data;
+    }
+
+    /**
+     * Handle filtering data
+     */
+    private function filterData($data)
+    {
+        if (! in_array($this->filter, ['published', 'unpublished'])) {
+            return $data;
+        }
+
+        $filter = 'filter'.Str::ucfirst($this->filter);
+
+        if ($data instanceof IlluminateCollection) {
+            $data = $data->filter(function ($entry) use ($filter) {
+                return $this->$filter($entry);
+            })->filter();
+        } else {
+            $data = $this->$filter($data);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Filter unpublished content
+     */
+    private function filterUnpublished($data)
+    {
+        return method_exists($data, 'published')
+            ? ($data->published() ? null : $data)
+            : $data;
+    }
+
+    /**
+     * Filter published content
+     */
+    private function filterPublished($data)
+    {
+        return method_exists($data, 'published')
+            ? ($data->published() ? $data : null)
+            : $data;
     }
 
     /**
