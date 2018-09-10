@@ -8,7 +8,7 @@ class FetchController extends Controller
 {
     private $fetch;
 
-    public function init()
+    public function __construct()
     {
         $this->fetch = new Fetch;
 
