@@ -24,11 +24,11 @@ Simply copy the `Fetch` folder into `site/addons/`. That's it!
 ### Types
 
 * [**Collection**](#collection-examples): The Collection's slug.
-* [**Page**](#pages-examples): A single page's URI.
-* [**Pages**](#pages-examples): All pages or a comma-separated list of page URIs.
-* [**Global**](#globals-examples): A single global slug.
-* [**Globals**](#globals-examples): All globals or a comma-separated list of global slugs.
-* [**Search**](#search-examples): A search query.
+* [**Page**](#pages-examples): A single Page's URI.
+* [**Pages**](#pages-examples): All Pages or a comma-separated list of Page URIs.
+* [**Global**](#globals-examples): A single Global slug.
+* [**Globals**](#globals-examples): All Globals or a comma-separated list of Global slugs.
+* [**Search**](#search-examples): A Search query.
 
 ### Parameter Examples
 
