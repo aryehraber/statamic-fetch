@@ -138,21 +138,27 @@ class Fetch
     {
         $data = $this->filterData($data);
 
-        if ($this->deep) {
-            if ($data instanceof IlluminateCollection) {
-                $data = $data->map(function ($item) {
-                    return $this->getLocalisedData($item);
-                });
-            } else {
-                $data = $this->getLocalisedData($data);
-            }
-        }
+        $data = $this->processData($data);
 
         if ($this->debug) {
             dd($data);
         }
 
         return $data;
+    }
+
+    /**
+     * Get processed data
+     */
+    private function processData($data)
+    {
+        if ($data instanceof IlluminateCollection) {
+            return $data->map(function ($item) {
+                return $this->getLocalisedData($item);
+            });
+        }
+
+        return $this->getLocalisedData($data);
     }
 
     /**
