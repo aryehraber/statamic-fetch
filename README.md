@@ -37,12 +37,16 @@ The returned data would look like:
         "categories": [
             {
                 "title": "Statamic",
-                "id": "statamic"
+                "id": "categories/statamic",
+                "slug": "statamic",
+                ...
             },
             {
                 "title": "Awesome Addons",
-                "id": "addons"
-            },
+                "id": "categories/addons",
+                "slug": "addons",
+                ...
+            }
         ],
         "images": [
             "http://domain.com/assets/img/cool-stuff.jpg",
