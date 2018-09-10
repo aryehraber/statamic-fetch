@@ -41,8 +41,8 @@ class Fetch
         $params = collect($params);
 
         $this->auth = (new FetchAuth)->isAuth();
-        $this->debug = bool(request('debug')) || $params->get('debug');
         $this->deep = $this->checkDeep($params);
+        $this->debug = bool(request('debug'), $params->get('debug'));
         $this->locale = request('locale') ?: $params->get('locale') ?: default_locale();
 
         $this->page = (int) (request('page') ?: $params->get('page', 1));
