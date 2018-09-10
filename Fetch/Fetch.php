@@ -22,6 +22,14 @@ class Fetch
     public $debug;
     public $locale;
 
+    private $page;
+    private $limit;
+    private $offset;
+    private $filter;
+
+    private $hasNextPage;
+    private $totalResults;
+
     public function __construct($params = null)
     {
         $params = collect($params);
@@ -29,8 +37,12 @@ class Fetch
         $this->auth = (new FetchAuth)->isAuth();
         $this->deep = bool(request('deep')) || $this->getConfigBool('deep') || $params->get('deep');
         $this->debug = bool(request('debug')) || $params->get('debug');
-        $this->filter = request('filter') ?: $params->get('filter');
         $this->locale = request('locale') ?: $params->get('locale') ?: default_locale();
+
+        $this->page = (int) (request('page') ?: $params->get('page', 1));
+        $this->limit = (int) (request('limit') ?: $params->get('limit'));
+        $this->offset = (int) request('offset') ?: $params->get('offset');
+        $this->filter = request('filter') ?: $params->get('filter');
     }
 
     /**
@@ -138,7 +150,21 @@ class Fetch
     {
         $data = $this->filterData($data);
 
+        $this->setTotalResults($data);
+
+        $data = $this->offsetData($data);
+        $data = $this->limitData($data);
+
         $data = $this->processData($data);
+
+        $data = [
+            'data' => $data,
+            'page' => $this->page,
+            'limit' => $this->limit,
+            'offset' => $this->offset,
+            'has_next_page' => $this->hasNextPage,
+            'total_results' => $this->totalResults,
+        ];
 
         if ($this->debug) {
             dd($data);
@@ -201,6 +227,52 @@ class Fetch
         return method_exists($data, 'published')
             ? ($data->published() ? $data : null)
             : $data;
+    }
+
+    /**
+     * Handle offsetting data
+     */
+    private function offsetData($data)
+    {
+        if ($data instanceof IlluminateCollection && $this->offset) {
+            $data = $data->slice($this->offset);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Handle limiting data
+     */
+    private function limitData($data)
+    {
+        if ($data instanceof IlluminateCollection && $this->limit) {
+            $data = $data->forPage($this->page, $this->limit);
+
+            $this->setHasNextPage();
+        }
+
+        return $data;
+    }
+
+    /**
+     * Check if next page is available
+     */
+    private function setHasNextPage()
+    {
+        $count = $this->offset + ($this->page * $this->limit);
+
+        $this->hasNextPage = ($this->totalResults - $count) > 0;
+    }
+
+    /**
+     *
+     */
+    private function setTotalResults($data)
+    {
+        if ($data instanceof IlluminateCollection) {
+            $this->totalResults = $data->count();
+        }
     }
 
     /**
