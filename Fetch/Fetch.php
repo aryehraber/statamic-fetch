@@ -41,8 +41,8 @@ class Fetch
         $params = collect($params);
 
         $this->auth = (new FetchAuth)->isAuth();
-        $this->deep = bool(request('deep')) || $this->getConfigBool('deep') || $params->get('deep');
         $this->debug = bool(request('debug')) || $params->get('debug');
+        $this->deep = $this->checkDeep($params);
         $this->locale = request('locale') ?: $params->get('locale') ?: default_locale();
 
         $this->page = (int) (request('page') ?: $params->get('page', 1));
@@ -180,7 +180,9 @@ class Fetch
         $data = $this->offsetData($data);
         $data = $this->limitData($data);
 
-        $data = $this->processData($data);
+        if ($this->deep) {
+            $data = $this->processData($data);
+        }
 
         $data = [
             'data' => $data,
@@ -419,5 +421,12 @@ class Fetch
         }
 
         return true;
+    }
+
+    private function checkDeep($params)
+    {
+        $param = request('deep', $params->get('deep'));
+
+        return is_null($param) ? $this->getConfigBool('deep') : bool($param);
     }
 }
