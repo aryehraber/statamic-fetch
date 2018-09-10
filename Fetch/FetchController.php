@@ -67,4 +67,14 @@ class FetchController extends Controller
     {
         return $this->fetch->globals();
     }
+
+    public function getSearch()
+    {
+        return $this->fetch->search();
+    }
+
+    public function postSearch()
+    {
+        return $this->fetch->search();
+    }
 }

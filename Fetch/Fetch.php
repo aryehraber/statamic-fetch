@@ -7,6 +7,7 @@ use Statamic\API\Str;
 use Statamic\API\Page;
 use Statamic\API\Term;
 use Statamic\API\Asset;
+use Statamic\API\Search;
 use Statamic\API\Content;
 use Statamic\API\GlobalSet;
 use Statamic\API\Collection;
@@ -28,6 +29,10 @@ class Fetch
     private $filter;
     private $taxonomy;
 
+    private $index;
+    private $query;
+    private $isSearch;
+
     private $hasNextPage;
     private $totalResults;
 
@@ -45,6 +50,9 @@ class Fetch
         $this->offset = (int) request('offset') ?: $params->get('offset');
         $this->filter = request('filter') ?: $params->get('filter');
         $this->taxonomy = request('taxonomy') ?: $params->get('taxonomy');
+
+        $this->index = request('index') ?: $params->get('index');
+        $this->query = request('query') ?: $params->get('query');
     }
 
     /**
@@ -146,6 +154,20 @@ class Fetch
     }
 
     /**
+     * Fetch search results
+     */
+    public function search()
+    {
+        $this->isSearch = true;
+
+        $data = $this->index
+            ? Search::in($this->index)->search($this->query)
+            : Search::get($this->query);
+
+        return $this->handle($data);
+    }
+
+    /**
      * Handle data
      */
     private function handle($data)
@@ -181,13 +203,19 @@ class Fetch
      */
     private function processData($data)
     {
-        if ($data instanceof IlluminateCollection) {
-            return $data->map(function ($item) {
-                return $this->getLocalisedData($item);
-            });
+        if (! $data instanceof IlluminateCollection) {
+            return $this->getLocalisedData($data);
         }
 
-        return $this->getLocalisedData($data);
+        return $data->map(function ($item) {
+            $data = $this->getLocalisedData($item);
+
+            if ($this->isSearch) {
+                $data = collect($item)->merge($data->get('id'));
+            }
+
+            return $data;
+        });
     }
 
     /**
@@ -378,7 +406,7 @@ class Fetch
      */
     private function isRelatable($value, $key)
     {
-        if ($key === 'id') {
+        if ($key === 'id' && ! $this->isSearch) {
             return false;
         }
 
