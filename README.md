@@ -57,4 +57,4 @@ The returned data would look like:
 ]
 ```
 
-*(Please note: there's actually a lot more data that is returned, this is simply a summary for the example)*
+*Note: a lot more data is returned, this is simply a summary for the example.*
