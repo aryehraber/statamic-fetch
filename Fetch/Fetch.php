@@ -26,6 +26,7 @@ class Fetch
     private $limit;
     private $offset;
     private $filter;
+    private $taxonomy;
 
     private $hasNextPage;
     private $totalResults;
@@ -43,6 +44,7 @@ class Fetch
         $this->limit = (int) (request('limit') ?: $params->get('limit'));
         $this->offset = (int) request('offset') ?: $params->get('offset');
         $this->filter = request('filter') ?: $params->get('filter');
+        $this->taxonomy = request('taxonomy') ?: $params->get('taxonomy');
     }
 
     /**
@@ -148,6 +150,7 @@ class Fetch
      */
     private function handle($data)
     {
+        $data = $this->taxonomizeData($data);
         $data = $this->filterData($data);
 
         $this->setTotalResults($data);
@@ -185,6 +188,29 @@ class Fetch
         }
 
         return $this->getLocalisedData($data);
+    }
+
+    /**
+     * Handle taxonomy filters
+     */
+    private function taxonomizeData($data)
+    {
+        if ($this->taxonomy) {
+            $data = $data->filter(function ($entry) {
+                $taxonomies = collect(explode('|', $this->taxonomy));
+
+                return $taxonomies->first(function ($key, $value) use ($entry) {
+                    list($taxonomy, $term) = explode('/', $value);
+
+                    return collect($entry->get($taxonomy))
+                        ->contains(function ($key, $value) use ($term) {
+                            return $term === slugify($value);
+                        });
+                });
+            });
+        }
+
+        return $data;
     }
 
     /**
