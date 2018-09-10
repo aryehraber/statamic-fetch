@@ -2,33 +2,47 @@
 
 Simply copy the `Fetch` folder into `site/addons/`. That's it!
 
-## Options
+## Parameters
 
-* **deep** (boolean) [ *Default: true* ]: Fetch nested data recursively, works for arrays as well as related content.
-  * Example URL param: `http://domain.com/!/Fetch/collection/blog?deep=true`.
-  * Example Tag option: `{{ fetch:blog deep="true" }}`.
-* **filter** (string) [ *Default: null* ]: Optionally filter `published` and `unpublished` content.
-  * Example URL param: `http://domain.com/!/Fetch/collection/blog?filter=published`.
-  * Example Tag option: `{{ fetch:blog filter="published" }}`.
-* **locale** (string) [ *Default: default_locale* ]: Fetch data for a specific locale.
-  * Example URL param: `http://domain.com/!/Fetch/collection/blog?locale=nl`.
-  * Example Tag option: `{{ fetch:blog locale="nl" }}`.
-* **debug** (boolean) [ *Default: false* ]: Dump all data on the page (useful to check what data is available).
-  * Example URL param: `http://domain.com/!/Fetch/collection/blog?debug=true`.
-  * Example Tag option: `{{ fetch:blog debug="true" }}`.
-* **api_key** (string): When `Enable API Key` is activated in the settings, make sure to add the `api_key` to every request.
-  * Both `GET` and `POST` requests are supported; just include the `api_key` in the url query string or in the body of the request and the data will be returned.
-  * It is recommended to use `POST` requests over **HTTPS** to ensure your `api_key` remains secure.
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `deep` | Boolean | `true` | Fetch nested data recursively, works for arrays as well as related content. |
+| `filter` | String | `null` | Filter `published` and `unpublished` data. |
+| `taxonomy` | String | `null` | Filter data by a single or multiple taxonomies. |
+| `locale` | String | `null` | Fetch data for a specific locale. |
+| `limit` | Integer | `0` | Limit the total results returned. |
+| `offset` | Integer | `0` | The number of items the results should by offset by. |
+| `query` | String | `null` | The query to search for. |
+| `index` | String | `null` | The search index to use during Search (requires a [Collection Index](https://docs.statamic.com/search#collection-indexes)). |
+| `debug` | Boolean | `false` | Dump all data on the page (useful to check what data is available). |
+| `api_key` | String | `null` | When `Enable API Key` is activated in the settings, make sure to add the `api_key` to every request.* |
+
+\*Both `GET` and `POST` requests are supported; include the `api_key` in the url query string or in the body of the request. It is recommended to use `POST` requests over HTTPS to ensure your `api_key` remains secure.
 
 ## Usage
 
 ### Types
 
-* [**Collection**](#collection-examples): The Collection's slug (eg: `blog`).
-* [**Page**](#pages-examples): A single page's URI (eg: `/about`).
-* [**Pages**](#pages-examples): All pages or a comma-separated list of page URIs (eg: `/,/about,/contact-us`).
-* [**Global**](#globals-examples): A single global slug (eg: `opening_hours`).
-* [**Globals**](#globals-examples): All globals or a comma-separated list of global slugs (eg: `general,contact_info,opening_hours`).
+* [**Collection**](#collection-examples): The Collection's slug.
+* [**Page**](#pages-examples): A single Page's URI.
+* [**Pages**](#pages-examples): All Pages or a comma-separated list of Page URIs.
+* [**Global**](#globals-examples): A single Global slug.
+* [**Globals**](#globals-examples): All Globals or a comma-separated list of Global slugs.
+* [**Search**](#search-examples): A Search query.
+
+### Parameter Examples
+
+| Name | Example |
+|------|---------|
+| `deep` | URL: `http://domain.com/!/Fetch/collection/blog?deep=true` <br> Tag: `{{ fetch:blog deep="true" }}` |
+| `filter` | URL: `http://domain.com/!/Fetch/collection/blog?filter=published` <br> Tag: `{{ fetch:blog filter="published" }}` |
+| `taxonomy` | URL: `http://domain.com/!/Fetch/collection/blog?taxonomy=tags/news` <br> Tag: `{{ fetch:blog taxonomy="tags/news" }}` |
+| `locale` | URL: `http://domain.com/!/Fetch/collection/blog?locale=nl` <br> Tag: `{{ fetch:blog locale="nl" }}` |
+| `limit` | URL: `http://domain.com/!/Fetch/collection/blog?limit=5` <br> Tag: `{{ fetch:blog limit="5" }}` |
+| `offset` | URL: `http://domain.com/!/Fetch/collection/blog?offset=3` <br> Tag: `{{ fetch:blog offset="3" }}` |
+| `query` | URL: `http://domain.com/!/Fetch/collection/search?query=foo` <br> Tag: `{{ fetch:blog query="foo" }}` |
+| `index` | URL: `http://domain.com/!/Fetch/collection/blog?query=foo&index=collections/news` <br> Tag: `{{ fetch:blog query="foo" index="collections/news" }}` |
+| `debug` | URL: `http://domain.com/!/Fetch/collection/blog?debug=true` <br> Tag: `{{ fetch:blog debug="true" }}` |
 
 ### Collection Examples
 
@@ -223,10 +237,12 @@ This behavior can be disabled via Fetch's settings (CP > Configure > Addons > Fe
 
 The settings page is accessed via `CP > Configure > Addons > Fetch`.
 
-* **Deep** (boolean): Site default to 'go deep' when fetching data.
-* **Enable API Key** (boolean): Whether to use the API Key for authentication.
-* **API Key** (string): Generate an API Key. Only used when `Enable API Key` is set to true.
-* **IP Whitelist** (array): Add a list of IP addresses that are whitelisted to make requests. Leave blank to allow any.
-* **Domain Whitelist** (array): Add a list of Domains that are whitelisted to make requests. Leave blank to allow any.
+| Name | Type | Description |
+|------|------|-------------|
+| **Deep** | Boolean | Site default to 'go deep' when fetching data. |
+| **Enable API Key** | Boolean | Whether to use the API Key for authentication. |
+| **API Key** | String | Generate an API Key. Only used when `Enable API Key` is set to `true`. |
+| **IP Whitelist** | Array | List of whitelisted IP addresses. Leave blank to allow any. |
+| **Domain Whitelist** | Array | List of whitelisted Domains. Leave blank to allow any. |
 
-_Please note that these Authentication options are **not** 100% secure, it’s meant as a simple layer to stop ‘general’ access to the API endpoints. You cannot hold Fetch, or me, accountable for any leaked data._
+_Please note that these Authentication settings are potentially **not** completely secure, it’s meant as a simple layer to stop ‘general’ access to the API endpoints. If you have any ideas on improvements, please open a PR!_
