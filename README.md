@@ -1,6 +1,6 @@
 # Fetch
 
-**Access content directly as JSON using GET/POST requests or via a simple tag.**
+**Access content directly as JSON using URL endpoints or via a simple tag.**
 
 This addon will automatically make any of your collections, pages & globals accessible via a URL endpoint, `GET` / `POST` request, or via a simple tag.
 
