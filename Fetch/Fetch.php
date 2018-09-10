@@ -5,7 +5,6 @@ namespace Statamic\Addons\Fetch;
 use Carbon\Carbon;
 use Statamic\API\Str;
 use Statamic\API\Page;
-use Statamic\API\Term;
 use Statamic\API\Asset;
 use Statamic\API\Search;
 use Statamic\API\Content;
@@ -206,10 +205,14 @@ class Fetch
     private function processData($data)
     {
         if (! $data instanceof IlluminateCollection) {
+            $this->addTaxonomies($data);
+
             return $this->getLocalisedData($data);
         }
 
         return $data->map(function ($item) {
+            $this->addTaxonomies($item);
+
             $data = $this->getLocalisedData($item);
 
             if ($this->isSearch) {
@@ -312,6 +315,16 @@ class Fetch
     }
 
     /**
+     * Add Taxonomy data
+     */
+    private function addTaxonomies($data)
+    {
+        if (method_exists($data, 'supplementTaxonomies')) {
+            $data->supplementTaxonomies();
+        }
+    }
+
+    /**
      * Check if next page is available
      */
     private function setHasNextPage()
@@ -374,10 +387,6 @@ class Fetch
             return $asset->absoluteUrl();
         }
 
-        if ($term = $this->findTerm($value)) {
-            return $term;
-        }
-
         if (Content::exists($value)) {
             return Content::find($value)->toArray();
         }
@@ -387,20 +396,6 @@ class Fetch
         }
 
         return $value;
-    }
-
-    /**
-     * Find taxonomy term
-     */
-    private function findTerm($value)
-    {
-        if (strpos($value, '/') === false) {
-            return null;
-        }
-
-        list($taxonomy, $slug) = explode('/', $value);
-
-        return Term::whereSlug($slug, $taxonomy);
     }
 
     /**
