@@ -28,6 +28,16 @@ class FetchController extends Controller
         return $this->fetch->collection();
     }
 
+    public function getEntry()
+    {
+        return $this->fetch->entry();
+    }
+
+    public function postEntry()
+    {
+        return $this->fetch->entry();
+    }
+
     public function getPage()
     {
         return $this->fetch->page();
