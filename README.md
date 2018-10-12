@@ -2,7 +2,7 @@
 
 **Access content directly as JSON using URL endpoints or via a simple tag.**
 
-This addon will automatically make any of your collections, pages & globals accessible via a URL endpoint, `GET` / `POST` request, or via a simple tag.
+This addon will automatically make any of your collections, entries, pages & globals accessible via a URL endpoint, `GET` / `POST` request, or via a simple tag.
 
 Accessing your content via URL endpoints can be very useful when you need to fetch your site's data dynamically using Ajax or when you need access from another domain.
 

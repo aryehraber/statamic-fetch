@@ -24,6 +24,7 @@ Simply copy the `Fetch` folder into `site/addons/`. That's it!
 ### Types
 
 * [**Collection**](#collection-examples): The Collection's slug.
+* [**Entry**](#entry-examples): An Entry's ID or collection + slug.
 * [**Page**](#pages-examples): A single Page's URI.
 * [**Pages**](#pages-examples): All Pages or a comma-separated list of Page URIs.
 * [**Global**](#globals-examples): A single Global slug.
@@ -83,6 +84,34 @@ Shorthand
 Example passing data into a Vue component
 ```html
 <my-component :data='{{ fetch:blog }}'></my-component>
+```
+
+### Entry Examples
+
+Entries can either be fetched by their ID or by their collection + slug.
+
+**GET** request using Axios
+
+```javascript
+axios.get('/!/Fetch/entry/a1880157-2b7e-4d7c-ac8f-01790d821312').then(...);
+
+axios.get('/!/Fetch/entry/blog/my-awesome-blog-post').then(...);
+```
+
+**Tag**
+
+Fetch a single entry
+```html
+{{ fetch entry="a1880157-2b7e-4d7c-ac8f-01790d821312" }}
+
+{{ fetch entry="blog/my-awesome-blog-post" }}
+```
+
+Example passing data into a Vue component
+```html
+<my-component :data='{{ fetch entry="a1880157-2b7e-4d7c-ac8f-01790d821312" }}'></my-component>
+
+<my-component :data='{{ fetch entry="blog/my-awesome-blog-post" }}'></my-component>
 ```
 
 ### Page(s) Examples
