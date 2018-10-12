@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Statamic\API\Str;
 use Statamic\API\Page;
 use Statamic\API\Asset;
+use Statamic\API\Entry;
 use Statamic\API\Search;
 use Statamic\API\Content;
 use Statamic\API\GlobalSet;
@@ -162,6 +163,13 @@ class Fetch
         $data = $this->index
             ? Search::in($this->index)->search($this->query)
             : Search::get($this->query);
+
+        $data = $data->map(function ($item) {
+            $entry = Entry::find($item['id']);
+            $entry->set('search_score', $item['search_score']);
+
+            return $entry;
+        });
 
         return $this->handle($data);
     }
