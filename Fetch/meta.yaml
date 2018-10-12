@@ -1,6 +1,6 @@
 name: Fetch
-description: Access Collections and Pages directly as JSON using GET/POST requests or via a simple tag.
-url: -
 version: 4.1
+description: Access data directly as JSON using GET/POST requests or via a simple tag.
+url: https://statamic.com/marketplace/addons/fetch
 developer: Aryeh Raber
 developer_url: http://aryehdesigns.com
