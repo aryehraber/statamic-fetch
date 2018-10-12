@@ -70,6 +70,28 @@ class Fetch
     }
 
     /**
+     * Fetch single entry
+     */
+    public function entry($id = null)
+    {
+        if (is_null($id) && request()->segment(5)) {
+            $id = request()->segment(4).'/'.request()->segment(5);
+        } else {
+            $id = $id ?: request()->segment(4);
+        }
+
+        if (Str::contains($id, '/')) {
+            list($collection, $slug) = explode('/', $id);
+
+            $entry = Entry::whereSlug($slug, $collection);
+        } else {
+            $entry = Entry::find($id);
+        }
+
+        return $this->handle($entry);
+    }
+
+    /**
      * Fetch single page
      */
     public function page($uri = null)
