@@ -4,6 +4,7 @@ namespace Statamic\Addons\Fetch;
 
 use Carbon\Carbon;
 use Statamic\API\Str;
+use Statamic\API\URL;
 use Statamic\API\Page;
 use Statamic\API\Asset;
 use Statamic\API\Entry;
@@ -201,46 +202,46 @@ class Fetch
      */
     private function handle($data)
     {
-        $data = $this->taxonomizeData($data);
-        $data = $this->filterData($data);
+        $this->data = $data;
 
-        $this->setTotalResults($data);
-
-        $data = $this->offsetData($data);
-        $data = $this->limitData($data);
+        $this->taxonomizeData();
+        $this->filterData();
+        $this->setTotalResults();
+        $this->offsetData();
+        $this->limitData();
 
         if ($this->deep) {
-            $data = $this->processData($data);
+            $this->processData();
         }
 
-        $data = [
-            'data' => $data,
+        $result = collect([
+            'data' => $this->data,
             'page' => $this->page,
             'limit' => $this->limit,
             'offset' => $this->offset,
             'has_next_page' => $this->hasNextPage,
             'total_results' => $this->totalResults,
-        ];
+        ]);
 
         if ($this->debug) {
-            dd($data);
+            dd($result);
         }
 
-        return $data;
+        return $result;
     }
 
     /**
      * Get processed data
      */
-    private function processData($data)
+    private function processData()
     {
-        if (! $data instanceof IlluminateCollection) {
-            $this->addTaxonomies($data);
+        if (! $this->data instanceof IlluminateCollection) {
+            $this->addTaxonomies($this->data);
 
-            return $this->getLocalisedData($data);
+            return $this->getLocalisedData($this->data);
         }
 
-        return $data->map(function ($item) {
+        $this->data = $this->data->map(function ($item) {
             $this->addTaxonomies($item);
 
             $data = $this->getLocalisedData($item);
@@ -251,15 +252,17 @@ class Fetch
 
             return $data;
         });
+
+        return $this;
     }
 
     /**
      * Handle taxonomy filters
      */
-    private function taxonomizeData($data)
+    private function taxonomizeData()
     {
         if ($this->taxonomy) {
-            $data = $data->filter(function ($entry) {
+            $this->data = $this->data->filter(function ($entry) {
                 $taxonomies = collect(explode('|', $this->taxonomy));
 
                 return $taxonomies->first(function ($key, $value) use ($entry) {
@@ -273,29 +276,29 @@ class Fetch
             });
         }
 
-        return $data;
+        return $this;
     }
 
     /**
      * Handle filtering data
      */
-    private function filterData($data)
+    private function filterData()
     {
         if (! in_array($this->filter, ['published', 'unpublished'])) {
-            return $data;
+            return $this;
         }
 
         $filter = 'filter'.Str::ucfirst($this->filter);
 
-        if ($data instanceof IlluminateCollection) {
-            $data = $data->filter(function ($entry) use ($filter) {
+        if ($this->data instanceof IlluminateCollection) {
+            $this->data = $this->data->filter(function ($entry) use ($filter) {
                 return $this->$filter($entry);
             })->filter();
         } else {
-            $data = $this->$filter($data);
+            $this->data = $this->$filter($this->data);
         }
 
-        return $data;
+        return $this;
     }
 
     /**
@@ -321,27 +324,27 @@ class Fetch
     /**
      * Handle offsetting data
      */
-    private function offsetData($data)
+    private function offsetData()
     {
-        if ($data instanceof IlluminateCollection && $this->offset) {
-            $data = $data->slice($this->offset);
+        if ($this->data instanceof IlluminateCollection && $this->offset) {
+            $this->data = $this->data->slice($this->offset);
         }
 
-        return $data;
+        return $this;
     }
 
     /**
      * Handle limiting data
      */
-    private function limitData($data)
+    private function limitData()
     {
-        if ($data instanceof IlluminateCollection && $this->limit) {
-            $data = $data->forPage($this->page, $this->limit);
+        if ($this->data instanceof IlluminateCollection && $this->limit) {
+            $this->data = $this->data->forPage($this->page, $this->limit);
 
             $this->setHasNextPage();
         }
 
-        return $data;
+        return $this;
     }
 
     /**
@@ -367,10 +370,10 @@ class Fetch
     /**
      *
      */
-    private function setTotalResults($data)
+    private function setTotalResults()
     {
-        if ($data instanceof IlluminateCollection) {
-            $this->totalResults = $data->count();
+        if ($this->data instanceof IlluminateCollection) {
+            $this->totalResults = $this->data->count();
         }
     }
 
