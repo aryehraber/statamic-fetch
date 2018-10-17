@@ -4,6 +4,10 @@ fields:
   deep:
     type: toggle
     instructions: If set to false, you can manually add it to a request using <code>?deep=true</code>
+  index_collections:
+    type: collections
+    display: Auto-Index Collections
+    instructions: This is essential for use with Search, otherwise the search index will be out of sync.
   authentication:
     type: section
   enable_api_key:
