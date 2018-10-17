@@ -413,10 +413,6 @@ class Fetch
      */
     private function relatedData($value, $key)
     {
-        if (is_float($value)) {
-            return $value;
-        }
-
         if ($asset = Asset::find($value)) {
             return $asset->absoluteUrl();
         }
@@ -442,6 +438,10 @@ class Fetch
         }
 
         if (is_bool($value)) {
+            return false;
+        }
+
+        if (is_float($value)) {
             return false;
         }
 
