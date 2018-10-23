@@ -215,6 +215,12 @@ class Fetch
         $this->offsetData();
         $this->limitData();
 
+        if ($this->nested) {
+            if ($this->data instanceof \Statamic\Data\Pages\Page) {
+                $this->addNestedPages();
+            }
+        }
+
         if ($this->deep) {
             $this->processData();
         }
@@ -475,5 +481,33 @@ class Fetch
         }
 
         return $this->getConfigBool('nested');
+    }
+
+    private function addNestedPages()
+    {
+        $page = $this->data->toArray();
+
+        $depth = $this->depth > 0 ? $this->depth : null;
+        $children = collect(Content::tree($page['uri'], $depth, false, false, null, $this->locale));
+        $children = $children->map(function ($item) {
+            return $this->processNestedPage($item);
+        })->all();
+
+        $page['children'] = $children;
+
+        $this->data = $page;
+    }
+
+    private function processNestedPage(array $item): array
+    {
+        $page = $item['page']->toArray();
+
+        if ($item['children']) {
+            $page['children'] = collect($item['children'])->map(function ($item) {
+                return $this->processNestedPage($item);
+            })->all();
+        }
+
+        return $page;
     }
 }
