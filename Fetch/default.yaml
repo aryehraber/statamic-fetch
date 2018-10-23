@@ -1,4 +1,5 @@
 deep: true
+nested: false
 enable_api_key: false
 api_key: ''
 ip_whitelist: []
