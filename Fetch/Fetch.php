@@ -221,7 +221,7 @@ class Fetch
             }
         }
 
-        if ($this->deep) {
+        if ($this->deep && ! $this->nested) {
             $this->processData();
         }
 
