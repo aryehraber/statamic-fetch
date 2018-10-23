@@ -4,7 +4,6 @@ namespace Statamic\Addons\Fetch;
 
 use Carbon\Carbon;
 use Statamic\API\Str;
-use Statamic\API\URL;
 use Statamic\API\Page;
 use Statamic\API\Asset;
 use Statamic\API\Entry;
@@ -401,7 +400,7 @@ class Fetch
         $item = collect($item)->map(function ($value, $key) {
             if (is_array($value)) {
                 return collect($value)->map(function ($value) {
-                   return $this->goDeep($value);
+                    return $this->goDeep($value);
                 });
             }
 

@@ -50,7 +50,7 @@ class FetchAuth
         if (! getenv('HTTP_ORIGIN')) {
             return true;
         }
-        
+
         if (in_array(getenv('HTTP_ORIGIN'), $this->getConfig('domain_whitelist', []))) {
             return true;
         }
