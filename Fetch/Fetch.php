@@ -490,7 +490,7 @@ class Fetch
 
     private function addChildPagesToPage(\Statamic\Data\Pages\Page $page): array
     {
-        $data = $page->toArray();
+        $data = $this->getPageData($page);
 
         $depth = $this->depth > 0 ? $this->depth : null;
         $children = collect(Content::tree($data['uri'], $depth, false, false, null, $this->locale));
@@ -505,7 +505,7 @@ class Fetch
 
     private function processNestedPage(array $item): array
     {
-        $page = $item['page']->toArray();
+        $page = $this->getPageData($item['page']);
 
         if ($item['children']) {
             $page['children'] = collect($item['children'])->map(function ($item) {
@@ -514,5 +514,14 @@ class Fetch
         }
 
         return $page;
+    }
+
+    private function getPageData(\Statamic\Data\Pages\Page $page): array
+    {
+        if ($this->deep) {
+            $page->supplementTaxonomies();
+        }
+
+        return $page->toArray();
     }
 }
