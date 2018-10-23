@@ -48,7 +48,7 @@ class Fetch
         $this->auth = (new FetchAuth)->isAuth();
         $this->deep = $this->checkDeep($params);
         $this->nested = bool(request('nested', $params->get('nested', $this->getConfigBool('nested'))));
-        $this->depth = (int) (request('depth') ?: $params->get('depth', 0));
+        $this->depth = request('depth', $params->get('depth', null));
         $this->debug = bool(request('debug', $params->get('debug')));
         $this->locale = request('locale') ?: $params->get('locale') ?: default_locale();
 
