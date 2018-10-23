@@ -7,6 +7,8 @@ Simply copy the `Fetch` folder into `site/addons/`. That's it!
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
 | `deep` | Boolean | `true` | Fetch nested data recursively, works for arrays as well as related content. |
+| `nested` | Boolean | `false` | Add child pages to the page instead of the root of the response. |
+| `depth` | Integer | `0` | Depth of nested page to fetch. Only works `nested`. `0` means unlimited. |
 | `filter` | String | `null` | Filter `published` and `unpublished` data. |
 | `taxonomy` | String | `null` | Filter data by a single or multiple taxonomies. |
 | `locale` | String | `null` | Fetch data for a specific locale. |
@@ -26,6 +28,7 @@ The settings page is accessed via `CP > Configure > Addons > Fetch`.
 | Name | Type | Description |
 |------|------|-------------|
 | **Deep** | Boolean | Site default to 'go deep' when fetching data. |
+| **Nested** | Boolean | Site default to 'nested' parameter when fetching data. |
 | **Enable API Key** | Boolean | Whether to use the API Key for authentication. |
 | **API Key** | String | Generate an API Key. Only used when `Enable API Key` is set to `true`. |
 | **IP Whitelist** | Array | List of whitelisted IP addresses. Leave blank to allow any. |
@@ -56,6 +59,7 @@ This behavior can be disabled via Fetch's settings (CP > Configure > Addons > Fe
 | Name | Example |
 |------|---------|
 | `deep` | URL: `http://domain.com/!/Fetch/collection/blog?deep=true` <br> Tag: `{{ fetch:blog deep="true" }}` |
+| `nested` | URL: `http://domain.com/!/Fetch/collection/blog?nested=true` <br> Tag: `{{ fetch:blog nested="true" }}` |
 | `filter` | URL: `http://domain.com/!/Fetch/collection/blog?filter=published` <br> Tag: `{{ fetch:blog filter="published" }}` |
 | `taxonomy` | URL: `http://domain.com/!/Fetch/collection/blog?taxonomy=tags/news` <br> Tag: `{{ fetch:blog taxonomy="tags/news" }}` |
 | `locale` | URL: `http://domain.com/!/Fetch/collection/blog?locale=nl` <br> Tag: `{{ fetch:blog locale="nl" }}` |
@@ -141,6 +145,11 @@ Fetch multiple pages
 var pages = '/, /about, /contact-us';
 
 axios.get('/!/Fetch/pages/?pages='+encodeURIComponent(pages)).then(...);
+```
+
+Fetch pages nested
+```javascript
+axios.get('/!/Fetch/pages/?nested=true&depth=5').then(...);
 ```
 
 **Tag**
