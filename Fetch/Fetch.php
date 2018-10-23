@@ -33,6 +33,8 @@ class Fetch
     private $query;
     private $isSearch;
 
+    /** @var \Illuminate\Support\Collection */
+    private $data;
     private $hasNextPage;
     private $totalResults;
 
