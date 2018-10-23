@@ -11,6 +11,7 @@ use Statamic\API\Search;
 use Statamic\API\Content;
 use Statamic\API\GlobalSet;
 use Statamic\API\Collection;
+use Statamic\Data\Pages\PageCollection;
 use Statamic\Extend\Extensible;
 use Illuminate\Support\Collection as IlluminateCollection;
 
@@ -133,13 +134,19 @@ class Fetch
         }
 
         if ($pages) {
-            $pages = collect($pages)->map(function ($uri) {
+            $pages = collect_pages($pages)->map(function ($uri) {
                 $uri = Str::ensureLeft(trim($uri), '/');
 
                 return Page::whereUri($uri);
             })->filter();
         } else {
-            $pages = Page::all();
+            if ($this->nested) {
+                $pages = collect_pages([
+                    Page::whereUri('/'),
+                ]);
+            } else {
+                $pages = Page::all();
+            }
         }
 
         return $this->handle($pages);
@@ -217,7 +224,15 @@ class Fetch
 
         if ($this->nested) {
             if ($this->data instanceof \Statamic\Data\Pages\Page) {
-                $this->addNestedPages();
+                $this->data = $this->addChildPagesToPage($this->data);
+            }
+
+            if ($this->data instanceof PageCollection) {
+                $this->data = $this->data->map(
+                    function (\Statamic\Data\Pages\Page $page) {
+                        return $this->addChildPagesToPage($page);
+                    }
+                )->all();
             }
         }
 
@@ -483,19 +498,19 @@ class Fetch
         return $this->getConfigBool('nested');
     }
 
-    private function addNestedPages()
+    private function addChildPagesToPage(\Statamic\Data\Pages\Page $page): array
     {
-        $page = $this->data->toArray();
+        $data = $page->toArray();
 
         $depth = $this->depth > 0 ? $this->depth : null;
-        $children = collect(Content::tree($page['uri'], $depth, false, false, null, $this->locale));
+        $children = collect(Content::tree($data['uri'], $depth, false, false, null, $this->locale));
         $children = $children->map(function ($item) {
             return $this->processNestedPage($item);
         })->all();
 
-        $page['children'] = $children;
+        $data['children'] = $children;
 
-        $this->data = $page;
+        return $data;
     }
 
     private function processNestedPage(array $item): array
