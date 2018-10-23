@@ -8,7 +8,7 @@ Simply copy the `Fetch` folder into `site/addons/`. That's it!
 |------|------|---------|-------------|
 | `deep` | Boolean | `true` | Fetch nested data recursively, works for arrays as well as related content. |
 | `nested` | Boolean | `false` | Add child pages to the page instead of the root of the response. |
-| `depth` | Integer | `0` | Depth of nested page to fetch. Only works `nested`. `0` means unlimited. |
+| `depth` | Integer | `null` | Depth of nested page to fetch. Only works `nested`. `null` means unlimited. |
 | `filter` | String | `null` | Filter `published` and `unpublished` data. |
 | `taxonomy` | String | `null` | Filter data by a single or multiple taxonomies. |
 | `locale` | String | `null` | Fetch data for a specific locale. |
