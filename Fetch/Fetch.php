@@ -232,7 +232,7 @@ class Fetch
                     function (\Statamic\Data\Pages\Page $page) {
                         return $this->addChildPagesToPage($page);
                     }
-                )->all();
+                );
             }
         }
 
