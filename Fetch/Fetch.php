@@ -238,7 +238,9 @@ class Fetch
         if (! $this->data instanceof IlluminateCollection) {
             $this->addTaxonomies($this->data);
 
-            return $this->getLocalisedData($this->data);
+            $this->data = $this->getLocalisedData($this->data);
+
+            return $this;
         }
 
         $this->data = $this->data->map(function ($item) {
