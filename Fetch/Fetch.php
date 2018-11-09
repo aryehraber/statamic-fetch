@@ -11,8 +11,9 @@ use Statamic\API\Search;
 use Statamic\API\Content;
 use Statamic\API\GlobalSet;
 use Statamic\API\Collection;
-use Statamic\Data\Pages\PageCollection;
 use Statamic\Extend\Extensible;
+use Statamic\Data\Pages\PageCollection;
+use Statamic\Data\Pages\Page as PageData;
 use Illuminate\Support\Collection as IlluminateCollection;
 
 class Fetch
@@ -21,10 +22,10 @@ class Fetch
 
     public $auth;
     public $deep;
-    public $nested;
-    public $depth;
     public $debug;
+    public $depth;
     public $locale;
+    public $nested;
 
     private $page;
     private $limit;
@@ -36,7 +37,6 @@ class Fetch
     private $query;
     private $isSearch;
 
-    /** @var \Illuminate\Support\Collection */
     private $data;
     private $hasNextPage;
     private $totalResults;
@@ -47,14 +47,14 @@ class Fetch
 
         $this->auth = (new FetchAuth)->isAuth();
         $this->deep = $this->checkDeep($params);
-        $this->nested = bool(request('nested', $params->get('nested', $this->getConfigBool('nested'))));
-        $this->depth = request('depth', $params->get('depth', null));
         $this->debug = bool(request('debug', $params->get('debug')));
+        $this->depth = (int) (request('depth', $params->get('depth', null)));
         $this->locale = request('locale') ?: $params->get('locale') ?: default_locale();
+        $this->nested = bool(request('nested', $params->get('nested', $this->getConfigBool('nested'))));
 
         $this->page = (int) (request('page') ?: $params->get('page', 1));
         $this->limit = (int) (request('limit') ?: $params->get('limit'));
-        $this->offset = (int) request('offset') ?: $params->get('offset');
+        $this->offset = (int) (request('offset') ?: $params->get('offset'));
         $this->filter = request('filter') ?: $params->get('filter');
         $this->taxonomy = request('taxonomy') ?: $params->get('taxonomy');
 
@@ -223,20 +223,10 @@ class Fetch
         $this->limitData();
 
         if ($this->nested) {
-            if ($this->data instanceof \Statamic\Data\Pages\Page) {
-                $this->data = $this->addChildPagesToPage($this->data);
-            }
-
-            if ($this->data instanceof PageCollection) {
-                $this->data = $this->data->map(
-                    function (\Statamic\Data\Pages\Page $page) {
-                        return $this->addChildPagesToPage($page);
-                    }
-                );
-            }
+            $this->processNestedPages();
         }
 
-        if ($this->deep && ! $this->nested) {
+        if ($this->deep) {
             $this->processData();
         }
 
@@ -254,6 +244,21 @@ class Fetch
         }
 
         return $result;
+    }
+
+    private function processNestedPages()
+    {
+        if ($this->data instanceof PageData) {
+            $this->data = $this->addChildPagesToPage($this->data);
+        }
+
+        if ($this->data instanceof PageCollection) {
+            $this->data = $this->data->map(function (PageData $page) {
+                return $this->addChildPagesToPage($page);
+            });
+        }
+
+        return $this;
     }
 
     /**
@@ -428,6 +433,10 @@ class Fetch
     {
         $item = collect($item)->map(function ($value, $key) {
             if (is_array($value)) {
+                if ($key === 'children') {
+                    return $value;
+                }
+
                 return collect($value)->map(function ($value) {
                     return $this->goDeep($value);
                 });
@@ -490,40 +499,31 @@ class Fetch
         return is_null($param) ? $this->getConfigBool('deep') : bool($param);
     }
 
-    private function addChildPagesToPage(\Statamic\Data\Pages\Page $page): array
+    private function addChildPagesToPage(PageData $page)
     {
-        $data = $this->getPageData($page);
+        $depth = $this->depth ?: null;
 
-        $depth = $this->depth > 0 ? $this->depth : null;
-        $children = collect(Content::tree($data['uri'], $depth, false, false, null, $this->locale));
-        $children = $children->map(function ($item) {
-            return $this->processNestedPage($item);
+        $data = collect(
+            Content::tree($page->uri(), $depth, false, false, null, $this->locale)
+        )->map(function ($page) {
+            return $this->processPage($page);
         })->all();
 
-        $data['children'] = $children;
-
-        return $data;
+        return $page->set('children', $data);
     }
 
-    private function processNestedPage(array $item): array
+    private function processPage(array $page)
     {
-        $page = $this->getPageData($item['page']);
-
-        if ($item['children']) {
-            $page['children'] = collect($item['children'])->map(function ($item) {
-                return $this->processNestedPage($item);
+        if (! empty($page['children'])) {
+            $page['children'] = collect($page['children'])->map(function ($page) {
+                return $this->processPage($page);
             })->all();
         }
 
+        $this->addTaxonomies($page['page']);
+
+        $page['page'] = $this->getLocalisedData($page['page']);
+
         return $page;
-    }
-
-    private function getPageData(\Statamic\Data\Pages\Page $page): array
-    {
-        if ($this->deep) {
-            $page->supplementTaxonomies();
-        }
-
-        return $page->toArray();
     }
 }
