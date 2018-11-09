@@ -3,7 +3,6 @@
 namespace Statamic\Addons\Fetch;
 
 use Statamic\Extend\Tags;
-use Statamic\API\Collection;
 
 class FetchTags extends Tags
 {

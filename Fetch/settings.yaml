@@ -4,6 +4,11 @@ fields:
   deep:
     type: toggle
     instructions: If set to false, you can manually add it to a request using <code>?deep=true</code>
+    width: 50
+  nested:
+    type: toggle
+    instructions: If set to false, you can manually add it to a request using <code>?nested=true</code>
+    width: 50
   index_collections:
     type: collections
     display: Auto-Index Collections
