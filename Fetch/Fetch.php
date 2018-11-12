@@ -8,11 +8,15 @@ use Statamic\API\Page;
 use Statamic\API\Term;
 use Statamic\API\Asset;
 use Statamic\API\Content;
+use Statamic\API\Taxonomy;
 use Statamic\API\GlobalSet;
 use Statamic\API\Collection;
 use Statamic\Extend\Extensible;
+use Statamic\Data\Entries\Entry;
 use Statamic\Data\Pages\Page as PageData;
+use Statamic\Data\Taxonomies\Term as TermData;
 use Statamic\Data\Globals\GlobalSet as GlobalData;
+use Statamic\Data\Taxonomies\Taxonomy as TaxonomyData;
 
 class Fetch
 {
@@ -31,6 +35,85 @@ class Fetch
         $this->deep = bool(request('deep')) || $this->getConfigBool('deep') || $params->get('deep');
         $this->debug = bool(request('debug')) || $params->get('debug');
         $this->locale = request('locale') ?: $params->get('locale') ?: default_locale();
+    }
+
+    /**
+     * Fetch taxonomy
+     */
+    public function taxonomy($handle = null)
+    {
+        $handle = $handle ?: request()->segment(4);
+
+        if (!$taxonomy = Taxonomy::whereHandle($handle)) {
+            return "Taxonomy [$handle] not found.";
+        }
+
+        return $this->handle($taxonomy);
+    }
+
+    /**
+     * Fetch taxonomies
+     */
+    public function taxonomies($taxonomies = null)
+    {
+        $taxonomies = $taxonomies ?: request('taxonomies');
+
+        if (!is_null($taxonomies) && !is_array($taxonomies)) {
+            $taxonomies = explode(',', $taxonomies);
+        }
+
+        if ($taxonomies) {
+            $taxonomies = collect($taxonomies)->map(function ($handle) {
+                return Taxonomy::whereHandle($handle);
+            })->filter();
+        } else {
+            $taxonomies = Taxonomy::all();
+        }
+
+        return $this->handle($taxonomies);
+    }
+
+    /**
+     * Fetch term
+     */
+    public function term($slug = null)
+    {
+        if ($slug) {
+            list($taxonomy, $slug) = explode('/', $slug, 2);
+        } else {
+            $taxonomy = request()->segment(4);
+            $slug = request()->segment(5);
+        }
+
+        if (!$term = Term::whereSlug($slug, $taxonomy)) {
+            return "Term [$taxonomy/$slug] not found.";
+        }
+
+        return $this->handle($term);
+    }
+
+    /**
+     * Fetch terms
+     */
+    public function terms($terms = null)
+    {
+        $terms = $terms ?: request('terms');
+
+        if (!is_null($terms) && !is_array($terms)) {
+            $terms = explode(',', $terms);
+        }
+
+        if ($terms) {
+            $terms = collect($terms)->map(function ($slug) {
+                list($taxonomy, $slug) = explode('/', $slug, 2);
+
+                return Term::whereSlug($slug, $taxonomy);
+            })->filter();
+        } else {
+            $terms = Term::all();
+        }
+
+        return $this->handle($terms);
     }
 
     /**
@@ -57,7 +140,7 @@ class Fetch
         if (! $uri || $uri == 'home') {
             $page = Page::whereUri('/');
         } else {
-            if (strpos('/'.request()->path(), $this->actionUrl('page')) !== false) {
+            if (strpos('/' . request()->path(), $this->actionUrl('page')) !== false) {
                 $uri = explode(ltrim($this->actionUrl('page'), '/'), request()->path())[1];
             }
 
@@ -137,7 +220,7 @@ class Fetch
     private function handle($data)
     {
         if ($this->deep) {
-            if ($data instanceof PageData || $data instanceof GlobalData) {
+            if ($data instanceof PageData || $data instanceof GlobalData || $data instanceof TaxonomyData || $data instanceof TermData) {
                 $data = $this->getLocalisedData($data);
             } else {
                 $data = $data->map(function ($item) {
@@ -174,10 +257,14 @@ class Fetch
      */
     private function goDeep($item)
     {
+        if ($item instanceof Taxonomy) {
+            $item = [$item->data()];
+        }
+
         $item = collect($item)->map(function ($value, $key) {
             if (is_array($value)) {
-                return collect($value)->map(function ($value) {
-                   return $this->goDeep($value);
+                return collect($value)->map(function ($value, $key) {
+                    return $this->goDeep([$key => $value]);
                 });
             }
 
@@ -201,7 +288,7 @@ class Fetch
         }
 
         if (Content::exists($value)) {
-            return Content::find($value)->toArray();
+            return Content::find($value)->data();
         }
 
         if ($key === 'mount') {

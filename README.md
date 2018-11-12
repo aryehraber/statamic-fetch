@@ -14,11 +14,108 @@ Simply copy the `Fetch` folder into `site/addons/`. That's it!
 
 ### Types
 
+* [**Taxonomy**](#taxonomies-examples): A single taxonomy's handle (eg: `/categories`).
+* [**Taxonomies**](#taxonomies-examples): All taxonomies or a comma-separated list of taxonomy handles (eg: `categories,types`).
+* [**Term**](#terms-examples): A single term's slug (eg: `categories/breaking-news`).
+* [**Terms**](#terms-examples): All terms or a comma-separated list of term slugs (eg: `categories/breaking-news,categories/old-news`).
 * [**Collection**](#collection-examples): The Collection's slug (eg: `blog`).
 * [**Page**](#pages-examples): A single page's URI (eg: `/about`).
 * [**Pages**](#pages-examples): All pages or a comma-separated list of page URIs (eg: `/,/about,/contact-us`).
 * [**Global**](#globals-examples): A single global slug (eg: `opening_hours`).
 * [**Globals**](#globals-examples): All globals or a comma-separated list of global slugs (eg: `general,contact_info,opening_hours`).
+
+### Taxonomy Examples
+
+**GET** request using Vue Resource
+
+Fetch a single taxonomy
+```javascript
+this.$http.get('/!/Fetch/taxonomy/categories').then(successCallback, errorCallback);
+```
+
+Fetch all taxonomies
+```javascript
+this.$http.get('/!/Fetch/taxonomies').then(successCallback, errorCallback);
+```
+
+Fetch multiple taxonomies
+```javascript
+var taxonomies = 'categories, types';
+
+this.$http.get('/!/Fetch/taxonomies/?taxonomies='+encodeURIComponent(taxonomies)).then(successCallback, errorCallback);
+```
+
+**POST** request using Vue Resource + API Key
+
+```javascript
+this.$http.post('/!/Fetch/taxonomy/categories', {api_key: 'YOUR_KEY_HERE'}).then(successCallback, errorCallback);
+```
+
+**POST** request using Guzzle + API Key
+
+```php
+$client = new GuzzleHttp\Client();
+
+$params = [
+    'api_key' => 'YOUR_KEY_HERE',
+    'taxonomies' => ['categories', 'types']
+];
+
+$response = $client->post('https://domain.com/!/Fetch/taxonomies', $params);
+
+if ($response->getStatusCode() == 200) {
+    $data = collect(json_decode($response->getBody(), true));
+} else {
+    // Handle errors
+}
+
+### Terms Examples
+
+**GET** request using Vue Resource
+
+Fetch a single term
+```javascript
+this.$http.get('/!/Fetch/term/categories/breaking-news').then(successCallback, errorCallback);
+```
+
+Fetch all terms
+```javascript
+this.$http.get('/!/Fetch/terms').then(successCallback, errorCallback);
+```
+
+Fetch multiple terms
+```javascript
+var taxonomies = 'breaking-news, old-news';
+
+this.$http.get('/!/Fetch/terms/?terms='+encodeURIComponent(taxonomies)).then(successCallback, errorCallback);
+```
+
+**POST** request using Vue Resource + API Key
+
+```javascript
+this.$http.post('/!/Fetch/categories/breaking-news', {api_key: 'YOUR_KEY_HERE'}).then(successCallback, errorCallback);
+```
+
+**POST** request using Guzzle + API Key
+
+```php
+$client = new GuzzleHttp\Client();
+
+$params = [
+    'api_key' => 'YOUR_KEY_HERE',
+    'terms' => ['breaking-news', 'old-news']
+];
+
+$response = $client->post('https://domain.com/!/Fetch/terms', $params);
+
+if ($response->getStatusCode() == 200) {
+    $data = collect(json_decode($response->getBody(), true));
+} else {
+    // Handle errors
+}
+
+return $data;
+```
 
 ### Collection Examples
 

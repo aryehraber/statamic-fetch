@@ -18,6 +18,46 @@ class FetchController extends Controller
         }
     }
 
+    public function getTaxonomy()
+    {
+        return $this->fetch->taxonomy();
+    }
+
+    public function postTaxonomy()
+    {
+        return $this->fetch->taxonomy();
+    }
+
+    public function getTaxonomies()
+    {
+        return $this->fetch->taxonomies();
+    }
+
+    public function postTaxonomies()
+    {
+        return $this->fetch->taxonomies();
+    }
+
+    public function getTerm()
+    {
+        return $this->fetch->term();
+    }
+
+    public function postTerm()
+    {
+        return $this->fetch->term();
+    }
+
+    public function getTerms()
+    {
+        return $this->fetch->terms();
+    }
+
+    public function postTerms()
+    {
+        return $this->fetch->terms();
+    }
+
     public function getCollection()
     {
         return $this->fetch->collection();
