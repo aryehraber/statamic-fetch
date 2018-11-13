@@ -32,16 +32,17 @@ class Fetch
     public $nested;
     public $withData = true;
     public $withEntries = true;
-
+  
     private $page;
     private $limit;
     private $offset;
     private $filter;
     private $taxonomy;
-
     private $index;
+
     private $query;
     private $isSearch;
+    private $withData = true;
 
     private $data;
     private $hasNextPage;
@@ -580,7 +581,7 @@ class Fetch
                     return $value;
                 }
 
-                return collect($value)->map(function ($value) {
+                return collect($value)->map(function ($value, $key) {
                     return $this->goDeep($value);
                 });
             }
