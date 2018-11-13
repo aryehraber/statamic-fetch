@@ -5,15 +5,18 @@ namespace Statamic\Addons\Fetch;
 use Carbon\Carbon;
 use Statamic\API\Str;
 use Statamic\API\Page;
+use Statamic\API\Term;
 use Statamic\API\Asset;
 use Statamic\API\Entry;
 use Statamic\API\Search;
 use Statamic\API\Content;
+use Statamic\API\Taxonomy;
 use Statamic\API\GlobalSet;
 use Statamic\API\Collection;
 use Statamic\Extend\Extensible;
 use Statamic\Data\Pages\PageCollection;
 use Statamic\Data\Pages\Page as PageData;
+use Statamic\Data\Taxonomies\Taxonomy as TaxonomyData;
 use Illuminate\Support\Collection as IlluminateCollection;
 
 class Fetch
@@ -26,16 +29,17 @@ class Fetch
     public $depth;
     public $locale;
     public $nested;
-
     private $page;
+
     private $limit;
     private $offset;
     private $filter;
     private $taxonomy;
-
     private $index;
+
     private $query;
     private $isSearch;
+    private $withData = true;
 
     private $data;
     private $hasNextPage;
@@ -48,18 +52,97 @@ class Fetch
         $this->auth = (new FetchAuth)->isAuth();
         $this->deep = $this->checkDeep($params);
         $this->debug = bool(request('debug', $params->get('debug')));
-        $this->depth = (int) (request('depth', $params->get('depth', null)));
+        $this->depth = (int)(request('depth', $params->get('depth', null)));
         $this->locale = request('locale') ?: $params->get('locale') ?: default_locale();
         $this->nested = bool(request('nested', $params->get('nested', $this->getConfigBool('nested'))));
 
-        $this->page = (int) (request('page') ?: $params->get('page', 1));
-        $this->limit = (int) (request('limit') ?: $params->get('limit'));
-        $this->offset = (int) (request('offset') ?: $params->get('offset'));
+        $this->page = (int)(request('page') ?: $params->get('page', 1));
+        $this->limit = (int)(request('limit') ?: $params->get('limit'));
+        $this->offset = (int)(request('offset') ?: $params->get('offset'));
         $this->filter = request('filter') ?: $params->get('filter');
         $this->taxonomy = request('taxonomy') ?: $params->get('taxonomy');
 
         $this->index = request('index') ?: $params->get('index');
         $this->query = request('query') ?: $params->get('query');
+    }
+
+    /**
+     * Fetch taxonomy
+     */
+    public function taxonomy($handle = null)
+    {
+        $handle = $handle ?: request()->segment(4);
+
+        if (!$taxonomy = Taxonomy::whereHandle($handle)) {
+            return "Taxonomy [$handle] not found.";
+        }
+
+        return $this->handle($taxonomy);
+    }
+
+    /**
+     * Fetch taxonomies
+     */
+    public function taxonomies($taxonomies = null)
+    {
+        $taxonomies = $taxonomies ?: request('taxonomies');
+
+        if (!is_null($taxonomies) && !is_array($taxonomies)) {
+            $taxonomies = explode(',', $taxonomies);
+        }
+
+        if ($taxonomies) {
+            $taxonomies = collect($taxonomies)->map(function ($handle) {
+                return Taxonomy::whereHandle($handle);
+            })->filter();
+        } else {
+            $taxonomies = Taxonomy::all();
+        }
+
+        return $this->handle($taxonomies);
+    }
+
+    /**
+     * Fetch term
+     */
+    public function term($slug = null)
+    {
+        if ($slug) {
+            list($taxonomy, $slug) = explode('/', $slug, 2);
+        } else {
+            $taxonomy = request()->segment(4);
+            $slug = request()->segment(5);
+        }
+
+        if (!$term = Term::whereSlug($slug, $taxonomy)) {
+            return "Term [$taxonomy/$slug] not found.";
+        }
+
+        return $this->handle($term);
+    }
+
+    /**
+     * Fetch terms
+     */
+    public function terms($terms = null)
+    {
+        $terms = $terms ?: request('terms');
+
+        if (!is_null($terms) && !is_array($terms)) {
+            $terms = explode(',', $terms);
+        }
+
+        if ($terms) {
+            $terms = collect($terms)->map(function ($slug) {
+                list($taxonomy, $slug) = explode('/', $slug, 2);
+
+                return Term::whereSlug($slug, $taxonomy);
+            })->filter();
+        } else {
+            $terms = Term::all();
+        }
+
+        return $this->handle($terms);
     }
 
     /**
@@ -69,7 +152,7 @@ class Fetch
     {
         $name = $name ?: request()->segment(4);
 
-        if (! $collection = Collection::whereHandle($name)) {
+        if (!$collection = Collection::whereHandle($name)) {
             return "Collection [$name] not found.";
         }
 
@@ -82,7 +165,7 @@ class Fetch
     public function entry($id = null)
     {
         if (is_null($id) && request()->segment(5)) {
-            $id = request()->segment(4).'/'.request()->segment(5);
+            $id = request()->segment(4) . '/' . request()->segment(5);
         } else {
             $id = $id ?: request()->segment(4);
         }
@@ -105,16 +188,16 @@ class Fetch
     {
         $uri = $uri ?: request()->segment(4);
 
-        if (! $uri || $uri == 'home') {
+        if (!$uri || $uri == 'home') {
             $page = Page::whereUri('/');
         } else {
-            if (strpos('/'.request()->path(), $this->actionUrl('page')) !== false) {
+            if (strpos('/' . request()->path(), $this->actionUrl('page')) !== false) {
                 $uri = explode(ltrim($this->actionUrl('page'), '/'), request()->path())[1];
             }
 
             $uri = Str::ensureLeft(trim($uri), '/');
 
-            if (! $page = Page::whereUri($uri)) {
+            if (!$page = Page::whereUri($uri)) {
                 return "Page [$uri] not found.";
             }
         }
@@ -129,7 +212,7 @@ class Fetch
     {
         $pages = $pages ?: request('pages');
 
-        if (! is_null($pages) && ! is_array($pages)) {
+        if (!is_null($pages) && !is_array($pages)) {
             $pages = explode(',', $pages);
         }
 
@@ -159,7 +242,7 @@ class Fetch
     {
         $handle = $handle ?: request()->segment(4);
 
-        if (! $global = GlobalSet::whereHandle($handle)) {
+        if (!$global = GlobalSet::whereHandle($handle)) {
             return "Page [$handle] not found.";
         }
 
@@ -173,7 +256,7 @@ class Fetch
     {
         $globals = $globals ?: request('globals');
 
-        if (! is_null($globals) && ! is_array($globals)) {
+        if (!is_null($globals) && !is_array($globals)) {
             $globals = explode(',', $globals);
         }
 
@@ -231,10 +314,10 @@ class Fetch
         }
 
         $result = collect([
-            'data' => $this->data,
-            'page' => $this->page,
-            'limit' => $this->limit,
-            'offset' => $this->offset,
+            'data'          => $this->data,
+            'page'          => $this->page,
+            'limit'         => $this->limit,
+            'offset'        => $this->offset,
             'has_next_page' => $this->hasNextPage,
             'total_results' => $this->totalResults,
         ]);
@@ -266,7 +349,7 @@ class Fetch
      */
     private function processData()
     {
-        if (! $this->data instanceof IlluminateCollection) {
+        if (!$this->data instanceof IlluminateCollection) {
             $this->addTaxonomies($this->data);
 
             $this->data = $this->getLocalisedData($this->data);
@@ -317,11 +400,11 @@ class Fetch
      */
     private function filterData()
     {
-        if (! in_array($this->filter, ['published', 'unpublished'])) {
+        if (!in_array($this->filter, ['published', 'unpublished'])) {
             return $this;
         }
 
-        $filter = 'filter'.Str::ucfirst($this->filter);
+        $filter = 'filter' . Str::ucfirst($this->filter);
 
         if ($this->data instanceof IlluminateCollection) {
             $this->data = $this->data->filter(function ($entry) use ($filter) {
@@ -431,14 +514,18 @@ class Fetch
      */
     private function goDeep($item)
     {
+        if ($item instanceof TaxonomyData) {
+            $item = [$item->data()];
+        }
+
         $item = collect($item)->map(function ($value, $key) {
             if (is_array($value)) {
                 if ($key === 'children') {
                     return $value;
                 }
 
-                return collect($value)->map(function ($value) {
-                    return $this->goDeep($value);
+                return collect($value)->map(function ($value, $key) {
+                    return $this->goDeep([$key => $value]);
                 });
             }
 
@@ -473,7 +560,7 @@ class Fetch
      */
     private function isRelatable($value, $key)
     {
-        if ($key === 'id' && ! $this->isSearch) {
+        if ($key === 'id' && !$this->isSearch) {
             return false;
         }
 
@@ -514,7 +601,7 @@ class Fetch
 
     private function processPage(array $page)
     {
-        if (! empty($page['children'])) {
+        if (!empty($page['children'])) {
             $page['children'] = collect($page['children'])->map(function ($page) {
                 return $this->processPage($page);
             })->all();

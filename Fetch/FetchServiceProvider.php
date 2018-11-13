@@ -14,7 +14,7 @@ class FetchServiceProvider extends ServiceProvider
         $excludes = Config::get('system.csrf_exclude', []);
         $actionUrl = $this->actionUrl('*');
 
-        if (! in_array($actionUrl, $excludes)) {
+        if (!in_array($actionUrl, $excludes)) {
             $excludes[] = $actionUrl;
             Config::set('system.csrf_exclude', $excludes);
         }
