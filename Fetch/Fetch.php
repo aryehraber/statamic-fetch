@@ -42,7 +42,6 @@ class Fetch
 
     private $query;
     private $isSearch;
-    private $withData = true;
 
     private $data;
     private $hasNextPage;
