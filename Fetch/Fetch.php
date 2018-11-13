@@ -74,7 +74,7 @@ class Fetch
     public function nav()
     {
         $this->withData = false;
-        $this->withEntries = request()->get('withEntries') === 'false' ? false : true;
+        $this->withEntries = request()->get('with_entries') === 'false' ? false : true;
 
         $tree = [
             [

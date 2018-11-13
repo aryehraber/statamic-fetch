@@ -18,6 +18,7 @@ Simply copy the `Fetch` folder into `site/addons/`. That's it!
 | `index` | String | `null` | The search index to use during Search (requires a [Collection Index](https://docs.statamic.com/search#collection-indexes)). |
 | `debug` | Boolean | `false` | Dump all data on the page (useful to check what data is available). |
 | `api_key` | String | `null` | When `Enable API Key` is activated in the settings, make sure to add the `api_key` to every request.* |
+| `with_entries` | Boolean | `true` | Whether or not the /nav endpoint should return child entries of a page. |
 
 \*Both `GET` and `POST` requests are supported; include the `api_key` in the url query string or in the body of the request. It is recommended to use `POST` requests over HTTPS to ensure your `api_key` remains secure.
 
@@ -46,6 +47,7 @@ This behavior can be disabled via Fetch's settings (CP > Configure > Addons > Fe
 
 ### Types
 
+* [**Nav**](#nav-examples)
 * [**Taxonomy**](#taxonomies-examples): The Taxonomy's slug.
 * [**Taxonomies**](#taxonomies-examples): All Taxonomies or a comma-separated list of Taxonomy slugs.
 * [**Term**](#terms-examples): The Term's slug.
@@ -73,6 +75,16 @@ This behavior can be disabled via Fetch's settings (CP > Configure > Addons > Fe
 | `index` | URL: `http://domain.com/!/Fetch/collection/blog?query=foo&index=collections/news` <br> Tag: `{{ fetch:blog query="foo" index="collections/news" }}` |
 | `debug` | URL: `http://domain.com/!/Fetch/collection/blog?debug=true` <br> Tag: `{{ fetch:blog debug="true" }}` |
 | `api_key` | URL: `http://domain.com/!/Fetch/collection/blog?api_key=[YOUR_KEY_HERE]` <br> Tag: `N/A`|
+| `with_entries` | URL: `http://domain.com/!/Fetch/nav/?with_entries=false` <br> Tag: `N/A`|
+
+### Nav Examples
+
+**JS**
+
+Fetch the navigation tree with child entries
+```javascript
+axios.get('/!/Fetch/nav').then(...);
+```
 
 ### Taxonomy Examples
 
