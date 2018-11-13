@@ -16,6 +16,7 @@ use Statamic\API\Collection;
 use Statamic\Extend\Extensible;
 use Statamic\Data\Pages\PageCollection;
 use Statamic\Data\Pages\Page as PageData;
+use Statamic\Data\Entries\Entry as EntryData;
 use Statamic\Data\Taxonomies\Taxonomy as TaxonomyData;
 use Illuminate\Support\Collection as IlluminateCollection;
 
@@ -29,17 +30,18 @@ class Fetch
     public $depth;
     public $locale;
     public $nested;
-    private $page;
+    public $withData = true;
+    public $withEntries = true;
 
+    private $page;
     private $limit;
     private $offset;
     private $filter;
     private $taxonomy;
-    private $index;
 
+    private $index;
     private $query;
     private $isSearch;
-    private $withData = true;
 
     private $data;
     private $hasNextPage;
@@ -64,6 +66,25 @@ class Fetch
 
         $this->index = request('index') ?: $params->get('index');
         $this->query = request('query') ?: $params->get('query');
+    }
+
+    /**
+     * Fetch nav
+     */
+    public function nav()
+    {
+        $this->withData = false;
+        $this->withEntries = request()->get('withEntries') === 'false' ? false : true;
+
+        $tree = [
+            [
+                'page'     => Page::whereUri('/'),
+                'depth'    => 0,
+                'children' => Content::tree('/', null, true, false)
+            ]
+        ];
+
+        return $this->handleNav($tree);
     }
 
     /**
@@ -301,7 +322,9 @@ class Fetch
 
         $this->taxonomizeData();
         $this->filterData();
-        $this->setTotalResults();
+        if ($this->withEntries) {
+            $this->setTotalResults();
+        }
         $this->offsetData();
         $this->limitData();
 
@@ -313,20 +336,51 @@ class Fetch
             $this->processData();
         }
 
+        if (!$this->withData && isset($data->toArray()['title'])) {
+            $this->data = [
+                'title' => $data->toArray()['title'],
+                'slug'  => $data->toArray()['slug'],
+                'uri'   => $data->toArray()['uri']
+            ];
+        }
+
         $result = collect([
-            'data'          => $this->data,
-            'page'          => $this->page,
-            'limit'         => $this->limit,
-            'offset'        => $this->offset,
-            'has_next_page' => $this->hasNextPage,
-            'total_results' => $this->totalResults,
+            'data'   => $this->data,
+            'page'   => $this->page,
+            'limit'  => $this->limit,
+            'offset' => $this->offset
         ]);
+
+        if ($this->withEntries) {
+            $result->put('has_next_page', $this->hasNextPage);
+            $result->put('total_results', $this->totalResults);
+        }
 
         if ($this->debug) {
             dd($result);
         }
 
         return $result;
+    }
+
+    /**
+     * Handle nav data
+     */
+    private function handleNav($tree)
+    {
+        $tree = collect($tree)->map(function ($branch) {
+            $branch['page'] = $this->handle($branch['page']);
+
+            if (empty($branch['children']) || (!$this->withEntries && reset($branch['children'])['page'] instanceof EntryData)) {
+                $branch['children'] = [];
+            } else {
+                $branch['children'] = $this->handleNav($branch['children']);
+            }
+
+            return $branch;
+        });
+
+        return $tree;
     }
 
     private function processNestedPages()
@@ -488,6 +542,8 @@ class Fetch
      */
     private function setTotalResults()
     {
+        $this->totalResults = 0;
+
         if ($this->data instanceof IlluminateCollection) {
             $this->totalResults = $this->data->count();
         }
@@ -524,8 +580,8 @@ class Fetch
                     return $value;
                 }
 
-                return collect($value)->map(function ($value, $key) {
-                    return $this->goDeep([$key => $value]);
+                return collect($value)->map(function ($value) {
+                    return $this->goDeep($value);
                 });
             }
 

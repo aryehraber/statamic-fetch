@@ -18,6 +18,11 @@ class FetchController extends Controller
         }
     }
 
+    public function getNav()
+    {
+        return $this->fetch->nav();
+    }
+
     public function getTaxonomy()
     {
         return $this->fetch->taxonomy();
