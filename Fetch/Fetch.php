@@ -30,22 +30,22 @@ class Fetch
     public $depth;
     public $locale;
     public $nested;
-    public $withData = true;
     public $withEntries = true;
-  
+
     private $page;
     private $limit;
     private $offset;
     private $filter;
     private $taxonomy;
-    private $index;
 
+    private $index;
     private $query;
     private $isSearch;
 
     private $data;
     private $hasNextPage;
     private $totalResults;
+    private $nav = false;
 
     public function __construct($params = null)
     {
@@ -73,7 +73,7 @@ class Fetch
      */
     public function nav()
     {
-        $this->withData = false;
+        $this->nav = true;
         $this->withEntries = request()->get('with_entries') === 'false' ? false : true;
 
         $tree = [
@@ -336,12 +336,13 @@ class Fetch
             $this->processData();
         }
 
-        if (!$this->withData && isset($data->toArray()['title'])) {
-            $this->data = [
-                'title' => $data->toArray()['title'],
-                'slug'  => $data->toArray()['slug'],
-                'uri'   => $data->toArray()['uri']
-            ];
+        if ($this->nav && $this->getConfig('nav_fields') !== null) {
+            $this->data = [];
+            collect($this->getConfig('nav_fields'))->each(function ($field) use ($data) {
+                if (isset($data->toArray()[$field])) {
+                    $this->data[$field] = $data->toArray()[$field];
+                }
+            });
         }
 
         $result = collect([
@@ -580,7 +581,7 @@ class Fetch
                     return $value;
                 }
 
-                return collect($value)->map(function ($value, $key) {
+                return collect($value)->map(function ($value) {
                     return $this->goDeep($value);
                 });
             }

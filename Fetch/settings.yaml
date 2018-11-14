@@ -29,3 +29,10 @@ fields:
     type: list
     display: Domain Whitelist
     instructions: Leave blank to allow requests from any Domain
+  nav:
+    type: section
+    display: Navigation endpoint options
+  nav_fields:
+    type: list
+    display: Fields to return
+    instructions: Leave blank to return all fields
