@@ -12,7 +12,7 @@ class FetchController extends Controller
     {
         $this->fetch = new Fetch;
 
-        if (!$this->fetch->auth) {
+        if (! $this->fetch->auth) {
             header("HTTP/1.1 401 Unauthorized");
             exit;
         }

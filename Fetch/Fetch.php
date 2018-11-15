@@ -94,7 +94,7 @@ class Fetch
     {
         $handle = $handle ?: request()->segment(4);
 
-        if (!$taxonomy = Taxonomy::whereHandle($handle)) {
+        if (! $taxonomy = Taxonomy::whereHandle($handle)) {
             return "Taxonomy [$handle] not found.";
         }
 
@@ -108,7 +108,7 @@ class Fetch
     {
         $taxonomies = $taxonomies ?: request('taxonomies');
 
-        if (!is_null($taxonomies) && !is_array($taxonomies)) {
+        if (! is_null($taxonomies) && ! is_array($taxonomies)) {
             $taxonomies = explode(',', $taxonomies);
         }
 
@@ -135,7 +135,7 @@ class Fetch
             $slug = request()->segment(5);
         }
 
-        if (!$term = Term::whereSlug($slug, $taxonomy)) {
+        if (! $term = Term::whereSlug($slug, $taxonomy)) {
             return "Term [$taxonomy/$slug] not found.";
         }
 
@@ -149,7 +149,7 @@ class Fetch
     {
         $terms = $terms ?: request('terms');
 
-        if (!is_null($terms) && !is_array($terms)) {
+        if (! is_null($terms) && ! is_array($terms)) {
             $terms = explode(',', $terms);
         }
 
@@ -173,7 +173,7 @@ class Fetch
     {
         $name = $name ?: request()->segment(4);
 
-        if (!$collection = Collection::whereHandle($name)) {
+        if (! $collection = Collection::whereHandle($name)) {
             return "Collection [$name] not found.";
         }
 
@@ -209,7 +209,7 @@ class Fetch
     {
         $uri = $uri ?: request()->segment(4);
 
-        if (!$uri || $uri == 'home') {
+        if (! $uri || $uri == 'home') {
             $page = Page::whereUri('/');
         } else {
             if (strpos('/' . request()->path(), $this->actionUrl('page')) !== false) {
@@ -218,7 +218,7 @@ class Fetch
 
             $uri = Str::ensureLeft(trim($uri), '/');
 
-            if (!$page = Page::whereUri($uri)) {
+            if (! $page = Page::whereUri($uri)) {
                 return "Page [$uri] not found.";
             }
         }
@@ -233,7 +233,7 @@ class Fetch
     {
         $pages = $pages ?: request('pages');
 
-        if (!is_null($pages) && !is_array($pages)) {
+        if (! is_null($pages) && ! is_array($pages)) {
             $pages = explode(',', $pages);
         }
 
@@ -263,7 +263,7 @@ class Fetch
     {
         $handle = $handle ?: request()->segment(4);
 
-        if (!$global = GlobalSet::whereHandle($handle)) {
+        if (! $global = GlobalSet::whereHandle($handle)) {
             return "Page [$handle] not found.";
         }
 
@@ -277,7 +277,7 @@ class Fetch
     {
         $globals = $globals ?: request('globals');
 
-        if (!is_null($globals) && !is_array($globals)) {
+        if (! is_null($globals) && ! is_array($globals)) {
             $globals = explode(',', $globals);
         }
 
@@ -372,7 +372,7 @@ class Fetch
         $tree = collect($tree)->map(function ($branch) {
             $branch['page'] = $this->handle($branch['page']);
 
-            if (empty($branch['children']) || (!$this->withEntries && reset($branch['children'])['page'] instanceof EntryData)) {
+            if (empty($branch['children']) || (! $this->withEntries && reset($branch['children'])['page'] instanceof EntryData)) {
                 $branch['children'] = [];
             } else {
                 $branch['children'] = $this->handleNav($branch['children']);
@@ -404,7 +404,7 @@ class Fetch
      */
     private function processData()
     {
-        if (!$this->data instanceof IlluminateCollection) {
+        if (! $this->data instanceof IlluminateCollection) {
             $this->addTaxonomies($this->data);
 
             $this->data = $this->getLocalisedData($this->data);
@@ -455,7 +455,7 @@ class Fetch
      */
     private function filterData()
     {
-        if (!in_array($this->filter, ['published', 'unpublished'])) {
+        if (! in_array($this->filter, ['published', 'unpublished'])) {
             return $this;
         }
 
@@ -617,7 +617,7 @@ class Fetch
      */
     private function isRelatable($value, $key)
     {
-        if ($key === 'id' && !$this->isSearch) {
+        if ($key === 'id' && ! $this->isSearch) {
             return false;
         }
 
@@ -658,7 +658,7 @@ class Fetch
 
     private function processPage(array $page)
     {
-        if (!empty($page['children'])) {
+        if (! empty($page['children'])) {
             $page['children'] = collect($page['children'])->map(function ($page) {
                 return $this->processPage($page);
             })->all();
