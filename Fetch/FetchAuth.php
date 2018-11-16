@@ -10,15 +10,15 @@ class FetchAuth
 
     public function isAuth()
     {
-        if ($this->getConfig('enable_api_key', false) && !$this->checkApiKey()) {
+        if ($this->getConfig('enable_api_key', false) && ! $this->checkApiKey()) {
             return false;
         }
 
-        if (!empty($this->getConfig('ip_whitelist', [])) && !$this->checkServerAddr()) {
+        if (! empty($this->getConfig('ip_whitelist', [])) && ! $this->checkServerAddr()) {
             return false;
         }
 
-        if (!empty($this->getConfig('domain_whitelist', [])) && !$this->checkRemoteDomain()) {
+        if (! empty($this->getConfig('domain_whitelist', [])) && ! $this->checkRemoteDomain()) {
             return false;
         }
 
@@ -47,7 +47,7 @@ class FetchAuth
 
     private function checkRemoteDomain()
     {
-        if (!getenv('HTTP_ORIGIN')) {
+        if (! getenv('HTTP_ORIGIN')) {
             return true;
         }
 
