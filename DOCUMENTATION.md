@@ -46,10 +46,6 @@ This behavior can be disabled via Fetch's settings (CP > Configure > Addons > Fe
 
 ### Types
 
-* [**Taxonomy**](#taxonomies-examples): The Taxonomy's slug.
-* [**Taxonomies**](#taxonomies-examples): All Taxonomies or a comma-separated list of Taxonomy slugs.
-* [**Term**](#terms-examples): The Term's slug.
-* [**Terms**](#terms-examples): All Terms or a comma-separated list of term slugs.
 * [**Collection**](#collection-examples): The Collection's slug.
 * [**Entry**](#entry-examples): An Entry's ID or collection + slug.
 * [**Page**](#pages-examples): A single Page's URI.
@@ -73,48 +69,6 @@ This behavior can be disabled via Fetch's settings (CP > Configure > Addons > Fe
 | `index` | URL: `http://domain.com/!/Fetch/collection/blog?query=foo&index=collections/news` <br> Tag: `{{ fetch:blog query="foo" index="collections/news" }}` |
 | `debug` | URL: `http://domain.com/!/Fetch/collection/blog?debug=true` <br> Tag: `{{ fetch:blog debug="true" }}` |
 | `api_key` | URL: `http://domain.com/!/Fetch/collection/blog?api_key=[YOUR_KEY_HERE]` <br> Tag: `N/A`|
-
-### Taxonomy Examples
-
-**JS**
-
-Fetch a single taxonomy
-```javascript
-axios.get('/!/Fetch/taxonomy/categories').then(...);
-```
-
-Fetch all taxonomies
-```javascript
-axios.get('/!/Fetch/taxonomies').then(...);
-```
-
-Fetch multiple taxonomies
-```javascript
-var globals = 'categories', 'types';
-
-axios.get('/!/Fetch/taxonomies/?taxonomies='+encodeURIComponent(globals)).then(...);
-```
-
-### Term Examples
-
-**JS**
-
-Fetch a single term
-```javascript
-axios.get('/!/Fetch/term/categories/cats').then(...);
-```
-
-Fetch all terms
-```javascript
-axios.get('/!/Fetch/terms').then(...);
-```
-
-Fetch multiple taxonomies
-```javascript
-var globals = 'cats', 'kittens';
-
-axios.get('/!/Fetch/terms/?terms='+encodeURIComponent(globals)).then(...);
-```
 
 ### Collection Examples
 

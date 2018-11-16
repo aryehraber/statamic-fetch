@@ -12,50 +12,10 @@ class FetchController extends Controller
     {
         $this->fetch = new Fetch;
 
-        if (!$this->fetch->auth) {
+        if (! $this->fetch->auth) {
             header("HTTP/1.1 401 Unauthorized");
             exit;
         }
-    }
-
-    public function getTaxonomy()
-    {
-        return $this->fetch->taxonomy();
-    }
-
-    public function postTaxonomy()
-    {
-        return $this->fetch->taxonomy();
-    }
-
-    public function getTaxonomies()
-    {
-        return $this->fetch->taxonomies();
-    }
-
-    public function postTaxonomies()
-    {
-        return $this->fetch->taxonomies();
-    }
-
-    public function getTerm()
-    {
-        return $this->fetch->term();
-    }
-
-    public function postTerm()
-    {
-        return $this->fetch->term();
-    }
-
-    public function getTerms()
-    {
-        return $this->fetch->terms();
-    }
-
-    public function postTerms()
-    {
-        return $this->fetch->terms();
     }
 
     public function getCollection()
