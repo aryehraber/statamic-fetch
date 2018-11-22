@@ -30,7 +30,6 @@ class Fetch
     public $depth;
     public $locale;
     public $nested;
-    public $withEntries = true;
 
     private $page;
     private $limit;
@@ -46,6 +45,7 @@ class Fetch
     private $hasNextPage;
     private $totalResults;
     private $nav = false;
+    private $withEntries;
 
     public function __construct($params = null)
     {
@@ -54,13 +54,13 @@ class Fetch
         $this->auth = (new FetchAuth)->isAuth();
         $this->deep = $this->checkDeep($params);
         $this->debug = bool(request('debug', $params->get('debug')));
-        $this->depth = (int)(request('depth', $params->get('depth', null)));
+        $this->depth = (int) (request('depth', $params->get('depth', null)));
         $this->locale = request('locale') ?: $params->get('locale') ?: default_locale();
         $this->nested = bool(request('nested', $params->get('nested', $this->getConfigBool('nested'))));
 
-        $this->page = (int)(request('page') ?: $params->get('page', 1));
-        $this->limit = (int)(request('limit') ?: $params->get('limit'));
-        $this->offset = (int)(request('offset') ?: $params->get('offset'));
+        $this->page = (int) (request('page') ?: $params->get('page', 1));
+        $this->limit = (int) (request('limit') ?: $params->get('limit'));
+        $this->offset = (int) (request('offset') ?: $params->get('offset'));
         $this->filter = request('filter') ?: $params->get('filter');
         $this->taxonomy = request('taxonomy') ?: $params->get('taxonomy');
 
