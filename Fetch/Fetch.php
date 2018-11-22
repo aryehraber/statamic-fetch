@@ -87,6 +87,85 @@ class Fetch
     }
 
     /**
+     * Fetch taxonomy
+     */
+    public function taxonomy($handle = null)
+    {
+        $handle = $handle ?: request()->segment(4);
+
+        if (! $taxonomy = Taxonomy::whereHandle($handle)) {
+            return "Taxonomy [$handle] not found.";
+        }
+
+        return $this->handle($taxonomy);
+    }
+
+    /**
+     * Fetch taxonomies
+     */
+    public function taxonomies($taxonomies = null)
+    {
+        $taxonomies = $taxonomies ?: request('taxonomies');
+
+        if (! is_null($taxonomies) && ! is_array($taxonomies)) {
+            $taxonomies = explode(',', $taxonomies);
+        }
+
+        if ($taxonomies) {
+            $taxonomies = collect($taxonomies)->map(function ($handle) {
+                return Taxonomy::whereHandle($handle);
+            })->filter();
+        } else {
+            $taxonomies = Taxonomy::all();
+        }
+
+        return $this->handle($taxonomies);
+    }
+
+    /**
+     * Fetch term
+     */
+    public function term($slug = null)
+    {
+        if ($slug) {
+            list($taxonomy, $slug) = explode('/', $slug, 2);
+        } else {
+            $taxonomy = request()->segment(4);
+            $slug = request()->segment(5);
+        }
+
+        if (! $term = Term::whereSlug($slug, $taxonomy)) {
+            return "Term [$taxonomy/$slug] not found.";
+        }
+
+        return $this->handle($term);
+    }
+
+    /**
+     * Fetch terms
+     */
+    public function terms($terms = null)
+    {
+        $terms = $terms ?: request('terms');
+
+        if (! is_null($terms) && ! is_array($terms)) {
+            $terms = explode(',', $terms);
+        }
+
+        if ($terms) {
+            $terms = collect($terms)->map(function ($slug) {
+                list($taxonomy, $slug) = explode('/', $slug, 2);
+
+                return Term::whereSlug($slug, $taxonomy);
+            })->filter();
+        } else {
+            $terms = Term::all();
+        }
+
+        return $this->handle($terms);
+    }
+
+    /**
      * Fetch collection
      */
     public function collection($name = null)
