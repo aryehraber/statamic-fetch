@@ -132,4 +132,9 @@ class FetchController extends Controller
     {
         return $this->fetch->search();
     }
+
+    public function postForm()
+    {
+        return $this->fetch->form();
+    }
 }

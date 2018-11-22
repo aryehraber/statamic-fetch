@@ -5,6 +5,8 @@ namespace Statamic\Addons\Fetch;
 use Carbon\Carbon;
 use Statamic\API\Str;
 use Statamic\API\Page;
+use Statamic\API\File;
+use Statamic\API\Form;
 use Statamic\API\Term;
 use Statamic\API\Asset;
 use Statamic\API\Entry;
@@ -14,7 +16,9 @@ use Statamic\API\Taxonomy;
 use Statamic\API\GlobalSet;
 use Statamic\API\Collection;
 use Statamic\Extend\Extensible;
+use Symfony\Component\Yaml\Yaml;
 use Statamic\Data\Pages\PageCollection;
+use Illuminate\Support\Facades\Validator;
 use Statamic\Data\Pages\Page as PageData;
 use Statamic\Data\Entries\Entry as EntryData;
 use Statamic\Data\Taxonomies\Taxonomy as TaxonomyData;
@@ -54,13 +58,13 @@ class Fetch
         $this->auth = (new FetchAuth)->isAuth();
         $this->deep = $this->checkDeep($params);
         $this->debug = bool(request('debug', $params->get('debug')));
-        $this->depth = (int) (request('depth', $params->get('depth', null)));
+        $this->depth = (int)(request('depth', $params->get('depth', null)));
         $this->locale = request('locale') ?: $params->get('locale') ?: default_locale();
         $this->nested = bool(request('nested', $params->get('nested', $this->getConfigBool('nested'))));
 
-        $this->page = (int) (request('page') ?: $params->get('page', 1));
-        $this->limit = (int) (request('limit') ?: $params->get('limit'));
-        $this->offset = (int) (request('offset') ?: $params->get('offset'));
+        $this->page = (int)(request('page') ?: $params->get('page', 1));
+        $this->limit = (int)(request('limit') ?: $params->get('limit'));
+        $this->offset = (int)(request('offset') ?: $params->get('offset'));
         $this->filter = request('filter') ?: $params->get('filter');
         $this->taxonomy = request('taxonomy') ?: $params->get('taxonomy');
 
@@ -311,6 +315,29 @@ class Fetch
         });
 
         return $this->handle($data);
+    }
+
+    /**
+     * Submit a form
+     */
+    public function form()
+    {
+        $form = Form::get(request()->header('form'));
+        $fields = collect($form->fields());
+
+        $validations = $fields->map(function ($field) {
+            return $field['validate'] ?? '';
+        });
+
+        $validator = Validator::make(request()->all(), $validations->toArray());
+
+        if ($validator->fails()) {
+            return ['error' => ['message' => $validator->errors()]];
+        }
+
+        File::disk('storage')->put('/forms/' . request()->header('form') . '/' . time() . '.yaml', Yaml::dump(request()->all()));
+
+        return ['success' => true];
     }
 
     /**
