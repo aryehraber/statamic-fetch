@@ -59,6 +59,7 @@ This behavior can be disabled via Fetch's settings (CP > Configure > Addons > Fe
 * [**Global**](#globals-examples): A single Global slug.
 * [**Globals**](#globals-examples): All Globals or a comma-separated list of Global slugs.
 * [**Search**](#search-examples): A Search query.
+* [**Form**](#form-examples): Submit a form.
 
 ### Parameter Examples
 
@@ -274,3 +275,14 @@ Example passing data into a Vue component
 ```html
 <my-component :data='{{ fetch:globals }}'></my-component>
 ```
+
+### Form
+
+**JS**
+
+Submit a form
+```javascript
+axios.post('/!/Fetch/form/' + formName, postData);
+```
+
+The form data is validated by the rules set in your form. An error message is returned fo each field that fails the validation.

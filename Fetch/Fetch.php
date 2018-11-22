@@ -320,9 +320,10 @@ class Fetch
     /**
      * Submit a form
      */
-    public function form()
+    public function form($name)
     {
-        $form = Form::get(request()->header('form'));
+        $name = $name ?: request()->segment(4);
+        $form = Form::get($name);
         $fields = collect($form->fields());
 
         $validations = $fields->map(function ($field) {
@@ -335,7 +336,7 @@ class Fetch
             return ['error' => ['message' => $validator->errors()]];
         }
 
-        File::disk('storage')->put('/forms/' . request()->header('form') . '/' . time() . '.yaml', Yaml::dump(request()->all()));
+        File::disk('storage')->put('/forms/' . $name . '/' . time() . '.yaml', Yaml::dump(request()->all()));
 
         return ['success' => true];
     }
