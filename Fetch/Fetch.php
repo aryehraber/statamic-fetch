@@ -4,6 +4,7 @@ namespace Statamic\Addons\Fetch;
 
 use Carbon\Carbon;
 use Statamic\API\Str;
+use Statamic\API\URL;
 use Statamic\API\Page;
 use Statamic\API\Asset;
 use Statamic\API\Entry;
@@ -35,6 +36,7 @@ class Fetch
 
     private $index;
     private $query;
+    private $config;
     private $isSearch;
 
     private $data;
@@ -60,6 +62,7 @@ class Fetch
 
         $this->index = request('index') ?: $params->get('index');
         $this->query = request('query') ?: $params->get('query');
+        $this->config = request('config') ?: $params->get('config');
     }
 
     /**
@@ -454,7 +457,7 @@ class Fetch
     private function relatedData($value, $key)
     {
         if ($asset = Asset::find($value)) {
-            return $asset->absoluteUrl();
+            return $this->getAsset($asset, $key);
         }
 
         if (Content::exists($value)) {
@@ -490,6 +493,27 @@ class Fetch
         }
 
         return true;
+    }
+
+    private function getAsset($asset, $key)
+    {
+        $config = collect($this->config)->filter(function ($item) use ($key) {
+            return array_get($item, 'type') === 'assets'
+                && array_get($item, 'field') === $key;
+        });
+
+        if ($config->isEmpty()) {
+            return $asset->absoluteUrl();
+        }
+
+        return $config->map(function ($config) use ($asset) {
+            return collect(array_get($config, 'glide'))
+                ->map(function ($glide) use ($asset) {
+                    return [$glide['name'] => URL::makeAbsolute($asset->manipulate($glide))];
+                })
+                ->collapse()
+                ->merge(['original' => $asset->absoluteUrl()]);
+        })->collapse();
     }
 
     private function checkDeep($params)
