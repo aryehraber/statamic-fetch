@@ -1,5 +1,5 @@
 name: Fetch
-version: 4.3.1
+version: 4.4.0
 description: Access data directly as JSON using GET/POST requests or via a simple tag.
 url: https://statamic.com/marketplace/addons/fetch
 developer: Aryeh Raber
