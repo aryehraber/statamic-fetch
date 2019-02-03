@@ -160,7 +160,7 @@ class Fetch
         $handle = $handle ?: request()->segment(4);
 
         if (! $global = GlobalSet::whereHandle($handle)) {
-            abort(404, "Page [$handle] not found.");
+            abort(404, "Global [$handle] not found.");
         }
 
         return $this->handle($global);
