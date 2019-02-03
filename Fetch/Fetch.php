@@ -70,7 +70,7 @@ class Fetch
         $name = $name ?: request()->segment(4);
 
         if (! $collection = Collection::whereHandle($name)) {
-            return "Collection [$name] not found.";
+            abort(404, "Collection [$name] not found.");
         }
 
         return $this->handle($collection->entries());
@@ -115,7 +115,7 @@ class Fetch
             $uri = Str::ensureLeft(trim($uri), '/');
 
             if (! $page = Page::whereUri($uri)) {
-                return "Page [$uri] not found.";
+                abort(404, "Page [$uri] not found.");
             }
         }
 
@@ -160,7 +160,7 @@ class Fetch
         $handle = $handle ?: request()->segment(4);
 
         if (! $global = GlobalSet::whereHandle($handle)) {
-            return "Page [$handle] not found.";
+            abort(404, "Page [$handle] not found.");
         }
 
         return $this->handle($global);
