@@ -13,7 +13,8 @@ class FetchTags extends Tags
      */
     public function __call($method, $args)
     {
-        $this->fetch = new Fetch($this->parameters);
+        $this->fetch = app(Fetch::class);
+        $this->fetch->setParameters($this->parameters);
 
         if ($name = explode(':', $this->tag)[1]) {
             if ($name === 'pages') {
@@ -33,7 +34,8 @@ class FetchTags extends Tags
      */
     public function index()
     {
-        $this->fetch = new Fetch($this->parameters);
+        $this->fetch = app(Fetch::class);
+        $this->fetch->setParameters($this->parameters);
 
         $types = collect(['collection', 'entry', 'page', 'pages', 'global', 'globals']);
 

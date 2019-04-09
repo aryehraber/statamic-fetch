@@ -9,6 +9,17 @@ class FetchServiceProvider extends ServiceProvider
 {
     public $defer = true;
 
+    public function register()
+    {
+        $this->app->singleton(FetchAuth::class, function () {
+            return new FetchAuth();
+        });
+
+        $this->app->singleton(Fetch::class, function ($app) {
+            return new Fetch($app[FetchAuth::class]);
+        });
+    }
+
     public function boot()
     {
         $excludes = Config::get('system.csrf_exclude', []);
@@ -18,5 +29,13 @@ class FetchServiceProvider extends ServiceProvider
             $excludes[] = $actionUrl;
             Config::set('system.csrf_exclude', $excludes);
         }
+    }
+
+    public function provides()
+    {
+        return [
+            FetchAuth::class,
+            Fetch::class,
+        ];
     }
 }
