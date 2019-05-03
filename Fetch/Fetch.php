@@ -281,8 +281,8 @@ class Fetch
         }
 
         $this->data = $this->data->map(function ($item) {
+            $item->locale($this->locale);
             $this->addTaxonomies($item);
-
             $data = $this->getLocalisedData($item);
 
             if ($this->isSearch) {
