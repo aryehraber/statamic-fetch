@@ -46,7 +46,7 @@ class Fetch
         $this->auth = $fetchAuth->isAuth();
     }
 
-    public function setParameters(array $params)
+    public function setParameters(array $params = [])
     {
         $params = collect($params);
 

@@ -15,6 +15,7 @@ class FetchController extends Controller
         parent::__construct();
 
         $this->fetch = $fetch;
+        $this->fetch->setParameters();
 
         if (! $this->fetch->auth) {
             header("HTTP/1.1 401 Unauthorized");
