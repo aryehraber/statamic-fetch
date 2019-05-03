@@ -41,11 +41,15 @@ class Fetch
     private $hasNextPage;
     private $totalResults;
 
-    public function __construct($params = null)
+    public function __construct(FetchAuth $fetchAuth)
+    {
+        $this->auth = $fetchAuth->isAuth();
+    }
+
+    public function setParameters(array $params)
     {
         $params = collect($params);
 
-        $this->auth = (new FetchAuth)->isAuth();
         $this->deep = $this->checkDeep($params);
         $this->debug = bool(request('debug', $params->get('debug')));
         $this->depth = (int) (request('depth', $params->get('depth', null)));

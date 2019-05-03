@@ -2,15 +2,19 @@
 
 namespace Statamic\Addons\Fetch;
 
+use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use Statamic\Extend\Controller;
 
 class FetchController extends Controller
 {
     private $fetch;
 
-    public function __construct()
+    public function __construct(Fetch $fetch)
     {
-        $this->fetch = new Fetch;
+        parent::__construct();
+
+        $this->fetch = $fetch;
 
         if (! $this->fetch->auth) {
             header("HTTP/1.1 401 Unauthorized");
@@ -20,71 +24,84 @@ class FetchController extends Controller
 
     public function getCollection()
     {
-        return $this->fetch->collection();
+        return $this->response($this->fetch->collection());
     }
 
     public function postCollection()
     {
-        return $this->fetch->collection();
+        return $this->response($this->fetch->collection());
     }
 
     public function getEntry()
     {
-        return $this->fetch->entry();
+        return $this->response($this->fetch->entry());
     }
 
     public function postEntry()
     {
-        return $this->fetch->entry();
+        return $this->response($this->fetch->entry());
     }
 
     public function getPage()
     {
-        return $this->fetch->page();
+        return $this->response($this->fetch->page());
     }
 
     public function postPage()
     {
-        return $this->fetch->page();
+        return $this->response($this->fetch->page());
     }
 
     public function getPages()
     {
-        return $this->fetch->pages();
+        return $this->response($this->fetch->pages());
     }
 
     public function postPages()
     {
-        return $this->fetch->pages();
+        return $this->response($this->fetch->pages());
     }
 
     public function getGlobal()
     {
-        return $this->fetch->global();
+        return $this->response($this->fetch->global());
     }
 
     public function postGlobal()
     {
-        return $this->fetch->global();
+        return $this->response($this->fetch->global());
     }
 
     public function getGlobals()
     {
-        return $this->fetch->globals();
+        return $this->response($this->fetch->globals());
     }
 
     public function postGlobals()
     {
-        return $this->fetch->globals();
+        return $this->response($this->fetch->globals());
     }
 
     public function getSearch()
     {
-        return $this->fetch->search();
+        return $this->response($this->fetch->search());
     }
 
     public function postSearch()
     {
-        return $this->fetch->search();
+        return $this->response($this->fetch->search());
+    }
+
+    private function response($data) {
+        if ($data instanceof Response) {
+            $response = $data;
+        } else {
+            $fetchData = $data instanceof Collection ? $data->toArray() : [];
+            $response = response()->json($fetchData);
+        }
+
+        $this->emitEvent('response.created', $response);
+
+        return $response;
     }
 }
