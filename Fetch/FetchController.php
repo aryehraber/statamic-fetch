@@ -93,6 +93,26 @@ class FetchController extends Controller
         return $this->response($this->fetch->search());
     }
 
+    public function getAssets()
+    {
+        return $this->response($this->fetch->assets());
+    }
+
+    public function postAssets()
+    {
+        return $this->response($this->fetch->assets());
+    }
+
+    public function getAsset()
+    {
+        return $this->response($this->fetch->asset());
+    }
+
+    public function postAsset()
+    {
+        return $this->response($this->fetch->asset());
+    }
+
     private function response($data) {
         if ($data instanceof Response) {
             $response = $data;
