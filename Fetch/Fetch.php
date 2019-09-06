@@ -249,10 +249,11 @@ class Fetch
      */
     public function asset($id = null)
     {
-        $id = $id ?: request()->segment(4);
+        $id = $id ?: request('id');
 
         if (! $asset = Asset::find($id)) {
             $message = "Asset [$id] not found.";
+
             return response($message, 404);
         }
 
