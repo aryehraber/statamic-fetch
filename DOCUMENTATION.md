@@ -52,6 +52,10 @@ This behavior can be disabled via Fetch's settings (CP > Configure > Addons > Fe
 * [**Pages**](#pages-examples): All Pages or a comma-separated list of Page URIs.
 * [**Global**](#globals-examples): A single Global slug.
 * [**Globals**](#globals-examples): All Globals or a comma-separated list of Global slugs.
+* [**Taxonomy**](#taxonomies-examples): A single Taxomony's ID.
+* [**Taxonomies**](#taxonomies-examples): All Taxonomies.
+* [**User**](#users-examples): A single User's username or email.
+* [**Users**](#users-examples): All Users.
 * [**Search**](#search-examples): A Search query.
 
 ### Parameter Examples
@@ -215,4 +219,71 @@ Fetch multiple globals
 Example passing data into a Vue component
 ```html
 <my-component :data='{{ fetch:globals }}'></my-component>
+```
+
+### Taxomomies Examples
+
+**JS**
+
+Fetch a single taxonomy
+```javascript
+axios.get('/!/Fetch/taxonomy/categories').then(...);
+```
+
+Fetch all taxonomies
+```javascript
+axios.get('/!/Fetch/taxonomies').then(...);
+```
+
+**Tag**
+
+Fetch a single taxonomy
+```html
+{{ fetch taxonomy="categories" }}
+```
+
+Fetch all taxonomies
+```html
+{{ fetch:taxonomies }}
+```
+
+### User(s) Examples
+
+**JS**
+
+Fetch a single user
+```javascript
+axios.get('/!/Fetch/user/admin').then(...);
+```
+```javascript
+axios.get('/!/Fetch/user/admin@example.com').then(...);
+```
+
+Fetch all users
+```javascript
+axios.get('/!/Fetch/users').then(...);
+```
+
+**Tag**
+
+Fetch a single user
+```html
+{{ fetch user="admin" }}
+```
+```html
+{{ fetch user="admin@example.com" }}
+```
+
+Fetch all users
+```html
+{{ fetch:users }}
+```
+
+### Search Examples
+
+**JS**
+
+Fetch search results
+```javascript
+axios.get('/!/Fetch/search?query=[search_term]').then(...);
 ```
