@@ -9,9 +9,9 @@ use Statamic\API\Asset;
 use Statamic\API\Entry;
 use Statamic\API\Search;
 use Statamic\API\Content;
+use Statamic\API\Taxonomy;
 use Statamic\API\GlobalSet;
 use Statamic\API\Collection;
-use Statamic\API\Taxonomy;
 use Statamic\Extend\Extensible;
 use Statamic\Data\Pages\PageCollection;
 use Statamic\Data\Pages\Page as PageData;
@@ -225,13 +225,7 @@ class Fetch
      */
     public function taxonomies()
     {
-        if (! $taxonomies = Taxonomy::all()) {
-            $message =  "Taxonomies not found.";
-
-            return request()->isJson() ? response($message, 404) : $message;
-        }
-
-        return $taxonomies->map(function ($taxonomy) {
+        return Taxonomy::all()->map(function ($taxonomy) {
             return $taxonomy->terms();
         });
     }
