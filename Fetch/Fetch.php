@@ -226,9 +226,11 @@ class Fetch
      */
     public function taxonomies()
     {
-        return Taxonomy::all()->map(function ($taxonomy) {
+        $taxonomies = Taxonomy::all()->map(function ($taxonomy) {
             return $taxonomy->terms();
-        });
+        })->toArray();
+
+        return $this->handle($taxonomies);
     }
 
     /**
@@ -244,7 +246,7 @@ class Fetch
             return request()->isJson() ? response($message, 404) : $message;
         }
 
-        return $taxonomy->terms();
+        return $this->handle($taxonomy->terms());
     }
 
     /**
