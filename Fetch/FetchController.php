@@ -102,7 +102,7 @@ class FetchController extends Controller
     {
         return $this->response($this->fetch->taxonomy());
     }
-  
+
     public function getAssets()
     {
         return $this->response($this->fetch->assets());

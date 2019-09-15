@@ -233,7 +233,7 @@ class Fetch
             return request()->isJson() ? response($message, 404) : $message;
         }
 
-        return Taxonomy::whereHandle($name)->terms();
+        return $taxonomy->terms();
     }
 
     /**
