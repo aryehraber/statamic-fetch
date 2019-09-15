@@ -212,10 +212,13 @@ class Fetch
             : Search::get($this->query);
 
         $data = $data->map(function ($item) {
-            $entry = Entry::find($item['id']);
-            $entry->set('search_score', $item['search_score']);
+            $content = Content::find($item['id']);
 
-            return $entry;
+            if (method_exists($content, 'set')) {
+                $content->set('search_score', $item['search_score']);
+            }
+
+            return $content;
         });
 
         return $this->handle($data);
