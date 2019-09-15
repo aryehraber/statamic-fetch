@@ -311,6 +311,18 @@ class Fetch
     }
 
     /**
+     * Fetch all users
+     */
+    public function users()
+    {
+        $users = User::all()->map(function ($user) {
+            return collect($user->data())->except('password_hash');
+        })->toArray();
+
+        return $this->handle($users);
+    }
+
+    /**
      * Handle data
      */
     private function handle($data)
