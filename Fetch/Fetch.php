@@ -228,7 +228,7 @@ class Fetch
     {
         $taxonomies = Taxonomy::all()->map(function ($taxonomy) {
             return $taxonomy->terms();
-        })->toArray();
+        });
 
         return $this->handle($taxonomies);
     }
@@ -319,7 +319,7 @@ class Fetch
     {
         $users = User::all()->map(function ($user) {
             return collect($user->data())->except('password_hash');
-        })->toArray();
+        });
 
         return $this->handle($users);
     }
