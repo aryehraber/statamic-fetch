@@ -226,6 +226,8 @@ class Fetch
      */
     public function taxonomies()
     {
+        $this->deep = false;
+
         $taxonomies = Taxonomy::all()->map(function ($taxonomy) {
             return $taxonomy->terms();
         });
@@ -238,6 +240,11 @@ class Fetch
      */
     public function taxonomy($name = null)
     {
+        $this->deep = false;
+
+        // Reset param due to conflicting use of "taxonomy"
+        $this->taxonomy = null;
+
         $name = $name ?: request()->segment(4);
 
         if (! $taxonomy = Taxonomy::whereHandle($name)) {
