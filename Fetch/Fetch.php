@@ -390,8 +390,12 @@ class Fetch
         }
 
         $this->data = $this->data->map(function ($item) {
-            $item->locale($this->locale);
+            if (method_exists($item, 'locale')) {
+                $item->locale($this->locale);
+            }
+
             $this->addTaxonomies($item);
+
             $data = $this->getLocalisedData($item);
 
             if ($this->isSearch) {
