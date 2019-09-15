@@ -133,6 +133,16 @@ class FetchController extends Controller
         return $this->response($this->fetch->asset());
     }
 
+    public function getUser()
+    {
+        return $this->response($this->fetch->user());
+    }
+
+    public function postUser()
+    {
+        return $this->response($this->fetch->user());
+    }
+
     private function response($data) {
         if ($data instanceof Response) {
             $response = $data;

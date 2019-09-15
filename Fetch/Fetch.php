@@ -5,6 +5,7 @@ namespace Statamic\Addons\Fetch;
 use Carbon\Carbon;
 use Statamic\API\Str;
 use Statamic\API\Page;
+use Statamic\API\User;
 use Statamic\API\Asset;
 use Statamic\API\Entry;
 use Statamic\API\Search;
@@ -285,6 +286,28 @@ class Fetch
         }
 
         return $this->handle($asset);
+    }
+
+    /**
+     * Fetch single user
+     */
+    public function user($username = null)
+    {
+        $username = $username ?: request()->segment(4);
+
+        if (! $user = User::whereUsername($username)) {
+            $user = User::whereEmail($username);
+        }
+
+        if (! $user) {
+            $message = "User [$username] not found.";
+
+            return response($message, 404);
+        }
+
+        $data = collect($user->data())->except('password_hash')->toArray();
+
+        return $this->handle($data);
     }
 
     /**
