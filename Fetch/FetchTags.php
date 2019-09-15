@@ -25,19 +25,33 @@ class FetchTags extends Tags
                 return $this->fetch->globals();
             }
 
+            if ($name === 'taxonomies') {
+                return $this->fetch->taxonomies();
+            }
+
+            if ($name === 'users') {
+                return $this->fetch->users();
+            }
+
             return $this->fetch->collection($name);
         }
     }
 
     /**
-     * Handle `{{ fetch collection|entry|page|pages="*"|global|globals="*" }}` tags
+     * Handle `{{ fetch collection|entry|page|pages="*"|global|globals="*"|taxonomy|taxonomies="*"|user|users="*" }}` tags
      */
     public function index()
     {
         $this->fetch = app(Fetch::class);
         $this->fetch->setParameters($this->parameters);
 
-        $types = collect(['collection', 'entry', 'page', 'pages', 'global', 'globals']);
+        $types = collect([
+            'entry', 'collection',
+            'page', 'pages',
+            'global', 'globals',
+            'taxonomy', 'taxonomies',
+            'user', 'users',
+        ]);
 
         $type = $types->first(function ($index, $type) {
             return in_array($type, array_keys($this->parameters));
