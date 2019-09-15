@@ -11,6 +11,7 @@ use Statamic\API\Search;
 use Statamic\API\Content;
 use Statamic\API\GlobalSet;
 use Statamic\API\Collection;
+use Statamic\API\Taxonomy;
 use Statamic\Extend\Extensible;
 use Statamic\Data\Pages\PageCollection;
 use Statamic\Data\Pages\Page as PageData;
@@ -217,6 +218,22 @@ class Fetch
         });
 
         return $this->handle($data);
+    }
+
+    /**
+     * Fetch taxonomy
+     */
+    public function taxonomy($name = null)
+    {
+        $name = $name ?: request()->segment(4);
+
+        if (! $taxonomy = Taxonomy::whereHandle($name)) {
+            $message =  "Taxonomy [$name] not found.";
+
+            return request()->isJson() ? response($message, 404) : $message;
+        }
+
+        return Taxonomy::whereHandle($name)->terms();
     }
 
     /**
