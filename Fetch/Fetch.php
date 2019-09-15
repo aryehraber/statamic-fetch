@@ -221,6 +221,22 @@ class Fetch
     }
 
     /**
+     * Fetch taxonomies
+     */
+    public function taxonomies()
+    {
+        if (! $taxonomies = Taxonomy::all()) {
+            $message =  "Taxonomies not found.";
+
+            return request()->isJson() ? response($message, 404) : $message;
+        }
+
+        return $taxonomies->map(function ($taxonomy) {
+            return $taxonomy->terms();
+        });
+    }
+
+    /**
      * Fetch taxonomy
      */
     public function taxonomy($name = null)

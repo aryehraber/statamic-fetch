@@ -93,6 +93,16 @@ class FetchController extends Controller
         return $this->response($this->fetch->search());
     }
 
+    public function getTaxonomies()
+    {
+        return $this->response($this->fetch->taxonomies());
+    }
+
+    public function postTaxonomies()
+    {
+        return $this->response($this->fetch->taxonomies());
+    }
+
     public function getTaxonomy()
     {
         return $this->response($this->fetch->taxonomy());
