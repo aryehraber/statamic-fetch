@@ -237,6 +237,47 @@ class Fetch
     }
 
     /**
+     * Fetch multiple assets
+     */
+    public function assets($assets = null, $container = null)
+    {
+        $assets = $assets ?: request('assets');
+        $container = $container ?: request('container');
+
+        if (! is_null($assets) && ! is_array($assets)) {
+            $assets = explode(',', $assets);
+        }
+
+        if ($container) {
+            $assets = Asset::whereContainer($container);
+        } elseif ($assets) {
+            $assets = collect($assets)->map(function ($path) {
+                return Asset::wherePath($path);
+            })->filter();
+        } else {
+            $assets = Asset::all();
+        }
+
+        return $this->handle($assets);
+    }
+
+    /**
+     * Fetch single asset
+     */
+    public function asset($id = null)
+    {
+        $id = $id ?: request('id');
+
+        if (! $asset = Asset::find($id)) {
+            $message = "Asset [$id] not found.";
+
+            return response($message, 404);
+        }
+
+        return $this->handle($asset);
+    }
+
+    /**
      * Handle data
      */
     private function handle($data)

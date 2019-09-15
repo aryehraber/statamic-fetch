@@ -100,7 +100,27 @@ class FetchController extends Controller
 
     public function postTaxonomy()
     {
-        return $this.response($this->fetch->taxonomy());
+        return $this->response($this->fetch->taxonomy());
+    }
+  
+    public function getAssets()
+    {
+        return $this->response($this->fetch->assets());
+    }
+
+    public function postAssets()
+    {
+        return $this->response($this->fetch->assets());
+    }
+
+    public function getAsset()
+    {
+        return $this->response($this->fetch->asset());
+    }
+
+    public function postAsset()
+    {
+        return $this->response($this->fetch->asset());
     }
 
     private function response($data) {
