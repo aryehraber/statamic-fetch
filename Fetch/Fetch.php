@@ -232,7 +232,7 @@ class Fetch
         $this->deep = false;
 
         $taxonomies = Taxonomy::all()->map(function ($taxonomy) {
-            return $taxonomy->terms();
+            return $taxonomy->terms()->localize($this->locale);
         });
 
         return $this->handle($taxonomies);
@@ -256,7 +256,7 @@ class Fetch
             return request()->isJson() ? response($message, 404) : $message;
         }
 
-        return $this->handle($taxonomy->terms());
+        return $this->handle($taxonomy->terms()->localize($this->locale));
     }
 
     /**
