@@ -153,6 +153,16 @@ class FetchController extends Controller
         return $this->response($this->fetch->users());
     }
 
+    public function getFormset()
+    {
+        return $this->response($this->fetch->formset());
+    }
+
+    public function postFormset()
+    {
+        return $this->response($this->fetch->formset());
+    }
+
     private function response($data) {
         if ($data instanceof Response) {
             $response = $data;

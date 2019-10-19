@@ -4,9 +4,11 @@ namespace Statamic\Addons\Fetch;
 
 use Carbon\Carbon;
 use Statamic\API\Str;
+use Statamic\API\Form;
 use Statamic\API\Page;
 use Statamic\API\User;
 use Statamic\API\Asset;
+use Statamic\API\Crypt;
 use Statamic\API\Entry;
 use Statamic\API\Search;
 use Statamic\API\Content;
@@ -332,6 +334,31 @@ class Fetch
         });
 
         return $this->handle($users);
+    }
+
+    /**
+     * Fetch formset
+     */
+    public function formset($name = null)
+    {
+        $name = $name ?: request()->segment(4);
+
+        if (! $formset = Form::get($name)) {
+            $message =  "Formset [$name] not found.";
+
+            return request()->isJson() ? response($message, 404) : $message;
+        }
+
+        $data = $formset->formset()->data();
+        $data['params'] = Crypt::encrypt(['formset' => $name]);
+
+        $result = collect(compact('data'));
+
+        if ($this->debug) {
+            dd($result);
+        }
+
+        return $result;
     }
 
     /**
