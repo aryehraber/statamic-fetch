@@ -38,7 +38,7 @@ class FetchTags extends Tags
     }
 
     /**
-     * Handle `{{ fetch collection|entry|page|pages="*"|global|globals="*"|taxonomy|taxonomies="*"|user|users="*" }}` tags
+     * Handle `{{ fetch collection|entry|page|pages="*"|global|globals="*"|taxonomy|taxonomies="*"|user|users="*"|formset }}` tags
      */
     public function index()
     {
@@ -51,6 +51,7 @@ class FetchTags extends Tags
             'global', 'globals',
             'taxonomy', 'taxonomies',
             'user', 'users',
+            'formset',
         ]);
 
         $type = $types->first(function ($index, $type) {
