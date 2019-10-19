@@ -56,6 +56,7 @@ This behavior can be disabled via Fetch's settings (CP > Configure > Addons > Fe
 * [**Taxonomies**](#taxonomies-examples): All Taxonomies.
 * [**User**](#users-examples): A single User's username or email.
 * [**Users**](#users-examples): All Users.
+* [**Formset**](#formset-examples): A single Formset slug.
 * [**Search**](#search-examples): A Search query.
 
 ### Parameter Examples
@@ -277,6 +278,46 @@ Fetch a single user
 Fetch all users
 ```html
 {{ fetch:users }}
+```
+
+### Formset Examples
+
+**JS**
+
+Fetch formset data
+```javascript
+axios.get('/!/Fetch/formset/contact').then(...);
+```
+
+Perform Statamic Form submission using ajax
+```javascript
+const form = document.querySelector('#contact-form');
+
+form.addEventListener('submit', e => {
+  e.preventDefault();
+
+  // First, fetch the formset's data
+  axios.get('/!/Fetch/formset/contact').then(resp => {
+    // Create a new FormData object from the form element
+    const formData = new FormData(form);
+
+    // Set the required encrypted params field
+    // for Statamic to handle the submission
+    formData.set('_params', resp.data.data.params);
+
+    // Once `_params` is set, we can perform the POST request
+    // Note the additional header being sent as part of the request
+    axios.post('/!/Form/create', formData, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(response => {
+      // Success!
+      console.log(response.data);
+    }).catch(error => {
+      // Errors...
+      console.log(error.response.data);
+    });
+  });
+});
 ```
 
 ### Search Examples
