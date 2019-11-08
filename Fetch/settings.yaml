@@ -29,3 +29,13 @@ fields:
     type: list
     display: Domain Whitelist
     instructions: Leave blank to allow requests from any Domain
+  caching:
+    type: section
+    instructions:
+  enable_caching:
+    type: toggle
+    display: Enable Caching
+  cache_ttl:
+    type: integer
+    display: Cache TTL in minutes
+    instructions: If left blank it will default to a day

@@ -328,3 +328,17 @@ Fetch search results
 ```javascript
 axios.get('/!/Fetch/search?query=[search_term]').then(...);
 ```
+
+### Caching
+
+Caching can be enabled from the settings page.
+When enabled all endpoints will be remembered for as long as the cache TTL is set, or for the default 24 hours.
+The following 3 headers are sent when caching is enabled:
+
+Header | Value
+---|---
+Statamic-Fetch-Cache-Enabled | Boolean telling whether or not caching is enabled
+Statamic-Fetch-Cache-Created-At | Timestamp of the moment the cache was created
+Statamic-Fetch-Cache-TTL | Caching TTL in minutes
+
+To manually clear the cache make a `GET` request to `/!/Fetch/clear-cache`
