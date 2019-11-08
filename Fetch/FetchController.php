@@ -3,15 +3,15 @@
 namespace Statamic\Addons\Fetch;
 
 use Illuminate\Http\Response;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 use Statamic\Extend\Controller;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Artisan;
 
 class FetchController extends Controller
 {
-    private $fetch;
+    protected $fetch;
     protected $cacheEnabled;
     protected $cacheCreatedAt;
     protected $cacheTtl;
@@ -229,7 +229,6 @@ class FetchController extends Controller
 
         try {
             Artisan::call($command);
-            trim(Artisan::output());
 
             return ['success' => true];
         } catch (\Exception $e) {
@@ -256,21 +255,27 @@ class FetchController extends Controller
         return call_user_func($response);
     }
 
-    private function response($data)
+    protected function response($data)
     {
-        if ($data instanceof Response) {
-            $response = $data;
-        } else {
-            $fetchData = $data instanceof Collection ? $data->toArray() : [];
-            $response = response()->json($fetchData);
-            $response->header('Statamic-Fetch-Cache-Enabled', $this->cacheEnabled);
-            if ($this->cacheEnabled) {
-                $response->header('Statamic-Fetch-Cache-Created-At', $this->cacheCreatedAt);
-                $response->header('Statamic-Fetch-Cache-TTL', $this->cacheTtl);
-            }
-        }
+        $response = $data instanceof Response ? $data : $this->createResponse($data);
 
         $this->emitEvent('response.created', $response);
+
+        return $response;
+    }
+
+    protected function createResponse($data)
+    {
+        $response = response()->json(
+            $data instanceof Collection ? $data->toArray() : []
+        );
+
+        $response->header('Statamic-Fetch-Cache-Enabled', $this->cacheEnabled);
+
+        if ($this->cacheEnabled) {
+            $response->header('Statamic-Fetch-Cache-Created-At', $this->cacheCreatedAt);
+            $response->header('Statamic-Fetch-Cache-TTL', $this->cacheTtl);
+        }
 
         return $response;
     }
