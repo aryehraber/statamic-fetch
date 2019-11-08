@@ -73,7 +73,9 @@ class FetchController extends Controller
 
     public function getPages()
     {
-        $this->response($this->fetch->pages());
+        return $this->cache(function () {
+            return $this->response($this->fetch->pages());
+        });
     }
 
     public function postPages()
