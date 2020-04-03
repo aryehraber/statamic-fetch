@@ -451,18 +451,20 @@ class Fetch
     private function taxonomizeData()
     {
         if ($this->taxonomy) {
-            $this->data = $this->data->filter(function ($entry) {
-                $taxonomies = collect(explode('|', $this->taxonomy));
+            foreach((array)$this->taxonomy as $taxonomyFilter) {
+                $this->data = $this->data->filter(function ($entry) use ($taxonomyFilter) {
+                    $taxonomies = collect(explode('|', $taxonomyFilter));
 
-                return $taxonomies->first(function ($key, $value) use ($entry) {
-                    list($taxonomy, $term) = explode('/', $value);
+                    return $taxonomies->first(function ($key, $value) use ($entry) {
+                        list($taxonomy, $term) = explode('/', $value);
 
-                    return collect($entry->get($taxonomy))
-                        ->contains(function ($key, $value) use ($term) {
-                            return $term === slugify($value);
-                        });
+                        return collect($entry->get($taxonomy))
+                            ->contains(function ($key, $value) use ($term) {
+                                return $term === slugify($value);
+                            });
+                    });
                 });
-            });
+            }
         }
 
         return $this;
